@@ -1,0 +1,35 @@
+{
+  "name": "kambria-wallet",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "REACT_APP_ENV=development react-scripts start",
+    "build": "npm run clean && babel wallet -d dist",
+    "test": "npm run build && cp -R dist src/dist && npm start",
+    "clean": "rm -rf dist && rm -rf ./src/dist"
+  },
+  "author": "tphanson <tphanson@kambria.io>",
+  "license": "ISC",
+  "dependencies": {
+    "web3": "^0.20.6"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "connected-react-router": "^6.0.0",
+    "react": "^16.6.3",
+    "react-dom": "^16.6.3",
+    "react-redux": "^6.0.0",
+    "react-router-dom": "^4.3.1",
+    "react-scripts": "^2.1.1",
+    "redux": "^4.0.1",
+    "redux-thunk": "^2.3.0"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}
