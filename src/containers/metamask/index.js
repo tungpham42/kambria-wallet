@@ -5,7 +5,7 @@ import Metamask from 'dist/metamask';
 class TestMetamask extends Component {
   constructor() {
     super();
-    this.metamask = new Metamask();
+    this.provider = new Metamask();
     this.state = {
       RESULT: null,
       ERROR: null,
@@ -20,13 +20,13 @@ class TestMetamask extends Component {
 
   componentDidMount() {
     // Get metamask status
-    this.metamask.metaStatus().then(re => {
+    this.provider.metaStatus().then(re => {
       this.setState({ METAMASK: re });
     }).catch(er => {
       this.setState({ METAMASK: er });
     });
     // Watch metamask
-    this.metamask.watch().then(watcher => {
+    this.provider.watch().then(watcher => {
       watcher.event.on('data', re => {
         this.setState({ RESULT: re, ERROR: null });
       });
