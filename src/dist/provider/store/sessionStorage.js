@@ -4,14 +4,14 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Store = function () {
-  function Store() {
-    _classCallCheck(this, Store);
+var SessionStorage = function () {
+  function SessionStorage() {
+    _classCallCheck(this, SessionStorage);
 
-    this.store = window.localStorage;
+    this.store = window.sessionStorage;
   }
 
-  _createClass(Store, [{
+  _createClass(SessionStorage, [{
     key: 'get',
     value: function get(key) {
       if (!key) return this.store;
@@ -36,7 +36,7 @@ var Store = function () {
     }
   }]);
 
-  return Store;
+  return SessionStorage;
 }();
 
-module.exports = Store;
+module.exports = SessionStorage;

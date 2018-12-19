@@ -1,29 +1,29 @@
-'use strict';
+const KAMBRIA_CODE = '55b8fc1234d845ffbea5da26f9ae70f5';
 
-var RPC = {
+const RPC = {
   MAINNET: {
     id: 1,
-    rpc: 'https://mainnet.infura.io/v3/55b8fc1234d845ffbea5da26f9ae70f5'
+    rpc: 'https://mainnet.infura.io/v3/' + KAMBRIA_CODE
   },
   ROPSTEN: {
     id: 3,
-    rpc: 'https://ropsten.infura.io/v3/55b8fc1234d845ffbea5da26f9ae70f5'
+    rpc: 'https://ropsten.infura.io/v3/' + KAMBRIA_CODE
   },
   KOVAN: {
     id: 42,
-    rpc: 'https://kovan.infura.io/v3/55b8fc1234d845ffbea5da26f9ae70f5'
+    rpc: 'https://kovan.infura.io/v3/' + KAMBRIA_CODE
   },
   RINKEBY: {
     id: 4,
-    rpc: 'https://rinkeby.infura.io/v3/55b8fc1234d845ffbea5da26f9ae70f5'
+    rpc: 'https://rinkeby.infura.io/v3/' + KAMBRIA_CODE
   },
   DEFAULT: {
     id: '*',
     rpc: 'http://localhost:9545'
   }
-};
+}
 
-var getRPC = function getRPC(net) {
+var getRPC = function (net) {
   switch (net) {
     case 1:
       return RPC.MAINNET.rpc;
@@ -44,6 +44,6 @@ var getRPC = function getRPC(net) {
     default:
       return RPC.DEFAULT.rpc;
   }
-};
+}
 
 module.exports = getRPC;

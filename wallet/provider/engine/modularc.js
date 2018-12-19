@@ -8,10 +8,11 @@ var HookedWalletSubprovider = require('web3-provider-engine/subproviders/hooked-
 var NonceSubprovider = require('web3-provider-engine/subproviders/nonce-tracker.js');
 var RpcSubprovider = require('web3-provider-engine/subproviders/rpc.js');
 
-const getRPC = require('./rpc');
-const ERROR = require('../error');
+const _defaut = require('./defaultFunc');
+const getRPC = require('../rpc');
+const error = require('../../error');
 
-class Engine {
+class Modularc {
   /**
    * 
    * @param {*} net - network ID or net work name
@@ -23,17 +24,17 @@ class Engine {
    */
   constructor(net, opts) {
     const rpc = getRPC(net);
-    if (!rpc) throw new Error(ERROR.CANNOT_CONNECT_RPC);
+    if (!rpc) throw new Error(error.CANNOT_CONNECT_RPC);
     if (!opts) opts = {};
 
     var self = this; // Globalize this
 
     this.RPC = rpc;
-    this._dataHandler = (!opts.dataHandler || typeof opts.dataHandler !== 'function') ? this._defaultDataHandler : opts.dataHandler;
-    this._errorHandler = (!opts.errorHandler || typeof opts.errorHandler !== 'function') ? this._defaultErrorHandler : opts.errorHandler;
-    this._getAccounts = (!opts.getAccounts || typeof opts.getAccounts !== 'function') ? this._defaultGetAccounts : opts.getAccounts;
-    this._approveTransaction = (!opts.approveTransaction || typeof opts.approveTransaction !== 'function') ? this._defaultApproveTransaction : opts.approveTransaction;
-    this._signTransaction = (!opts.signTransaction || typeof opts.signTransaction !== 'function') ? this._defaultSignTransaction : opts.signTransaction;
+    this.dataHandler = (!opts.dataHandler || typeof opts.dataHandler !== 'function') ? _defaut.dataHandler : opts.dataHandler;
+    this.errorHandler = (!opts.errorHandler || typeof opts.errorHandler !== 'function') ? _defaut.errorHandler : opts.errorHandler;
+    this.getAccounts = (!opts.getAccounts || typeof opts.getAccounts !== 'function') ? _defaut.getAccounts : opts.getAccounts;
+    this.approveTransaction = (!opts.approveTransaction || typeof opts.approveTransaction !== 'function') ? _defaut.approveTransaction : opts.approveTransaction;
+    this.signTransaction = (!opts.signTransaction || typeof opts.signTransaction !== 'function') ? _defaut.signTransaction : opts.signTransaction;
 
     var engine = new ProviderEngine();
     engine.addProvider(new FixtureSubprovider({
@@ -48,18 +49,18 @@ class Engine {
     engine.addProvider(new NonceSubprovider());
     engine.addProvider(new VmSubprovider());
     engine.addProvider(new HookedWalletSubprovider({
-      getAccounts: self._getAccounts,
-      approveTransaction: self._approveTransaction,
-      signTransaction: self._signTransaction
-    }))
+      getAccounts: self.getAccounts,
+      approveTransaction: self.approveTransaction,
+      signTransaction: self.signTransaction
+    }));
     engine.addProvider(new RpcSubprovider({
       rpcUrl: self.RPC
     }));
     engine.on('block', function (block) {
-      self._dataHandler(block);
+      self.dataHandler(block);
     });
     engine.on('error', function (er) {
-      self._errorHandler(er);
+      self.errorHandler(er);
     });
     engine.start(function (er) {
       if (er) throw new Error(er);
@@ -70,37 +71,6 @@ class Engine {
      */
     this.web3 = new Web3(engine);
   }
-
-  _defaultDataHandler(block) {
-    console.log('=========== NEW BLOCK ===========');
-    console.log('BLOCK NUMBER:', parseInt('0x' + block.number.toString('hex')));
-    console.log('HASH:', '0x' + block.hash.toString('hex'));
-    console.log('=================================');
-  }
-
-  _defaultErrorHandler(error) {
-    console.log('============= ERROR =============');
-    console.error(error.stack);
-    console.log('=================================');
-  }
-
-  _defaultGetAccounts(callback) {
-    var er = 'getAccounts() is not set yet'
-    console.error(er);
-    return callback(er, null);
-  }
-
-  _defaultApproveTransaction(txParams, callback) {
-    var er = 'approveTransaction() is not set yet'
-    console.error(er);
-    return callback(er, null);
-  }
-
-  _defaultSignTransaction(callback) {
-    var er = 'signTransaction() is not set yet'
-    console.error(er);
-    return callback(er, null);
-  }
 }
 
-module.exports = Engine;
+module.exports = Modularc;

@@ -1,6 +1,6 @@
-class Store {
+class SessionStorage {
   constructor() {
-    this.store = window.localStorage;
+    this.store = window.sessionStorage;
   }
 
   get(key) {
@@ -23,4 +23,4 @@ class Store {
   }
 }
 
-module.exports = Store;
+module.exports = SessionStorage;

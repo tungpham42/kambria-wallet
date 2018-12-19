@@ -15,8 +15,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var Web3 = require('web3');
 var EventEmitter = require('events');
 
-var ERROR = require('../error');
-var CHANGED = require('../changed');
+var error = require('../error');
+var CHANGED = require('./changed');
 var STATUS = require('./status');
 
 var Metamask = function () {
@@ -43,7 +43,7 @@ var Metamask = function () {
       BALANCE: null,
       CHANGED: null
     };
-    if (!window.web3 || !window.web3.currentProvider) throw new Error(ERROR.CANNOT_FOUND_PROVIDER);
+    if (!window.web3 || !window.web3.currentProvider) throw new Error(error.CANNOT_FOUND_PROVIDER);
     this.web3 = new Web3(window.web3.currentProvider);
   }
 
@@ -111,7 +111,7 @@ var Metamask = function () {
       var self = this;
       return new Promise(function (resolve, reject) {
         var re = self.web3.eth.coinbase;
-        if (!re || !self.isAddress(re)) return reject(ERROR.CANNOT_GET_ACCOUNT);
+        if (!re || !self.isAddress(re)) return reject(error.CANNOT_GET_ACCOUNT);
         return resolve(re);
       });
     }
@@ -126,7 +126,7 @@ var Metamask = function () {
     value: function getBalance(address) {
       var self = this;
       return new Promise(function (resolve, reject) {
-        if (!self.isAddress(address)) return reject(ERROR.CANNOT_GET_ACCOUNT);
+        if (!self.isAddress(address)) return reject(error.CANNOT_GET_ACCOUNT);
         self.web3.eth.getBalance(address, function (er, re) {
           if (er) return reject(er);
           return resolve(Number(re));
@@ -148,7 +148,7 @@ var Metamask = function () {
           return self.getAccount();
         }).then(function (re) {
           self.USER.ACCOUNT = re;
-          if (!self.USER.ACCOUNT) return reject(ERROR.CANNOT_GET_ACCOUNT);
+          if (!self.USER.ACCOUNT) return reject(error.CANNOT_GET_ACCOUNT);
           return self.getBalance(self.USER.ACCOUNT);
         }).then(function (re) {
           self.USER.BALANCE = re;
