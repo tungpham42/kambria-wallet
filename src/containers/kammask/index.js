@@ -4,7 +4,7 @@ import ABI from './ABI.json';
 import Kammask from 'dist/kammask';
 
 const NETWORK = 'rinkeby';
-const TYPE = 'hardwallet';
+const TYPE = 'softwallet';
 const ACCOUNTS = TYPE === 'hardwallet' ?
   ['0x09e64b88cd3cb0b7aa2590477e1dd31ce3d508ec', '0x5a926B235e992d6BA52d98415E66aFe5078A1690'] :
   ['0x76d8B624eFDDd1e9fC4297F82a2689315ac62d82', '0x5a926B235e992d6BA52d98415E66aFe5078A1690'];
@@ -47,9 +47,9 @@ class TestKammask extends Component {
 
     this.kammask = new Kammask(NETWORK, TYPE);
 
-    // this.kammask.setAccountByMnemonic(accOpts.mnemonic, accOpts.password, null, 0, accOpts.passphrase);
+    this.kammask.setAccountByMnemonic(accOpts.mnemonic, accOpts.password, null, 0, accOpts.passphrase);
     // this.kammask.setAccountByKeystore(accOpts.keystore, accOpts.password, accOpts.version, accOpts.passphrase);
-    this.kammask.setAccountByLedger();
+    // this.kammask.setAccountByLedger();
 
     this.kammask.web3.eth.getCoinbase(function (er, re) {
       if (er) return self.setState({ ERROR: er.toString() });

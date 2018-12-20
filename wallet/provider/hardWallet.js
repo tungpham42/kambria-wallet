@@ -56,7 +56,6 @@ class HardWallet {
           signedTx.r = Buffer.from(signature.r, 'hex');
           signedTx.s = Buffer.from(signature.s, 'hex');
           return callback(null, util.padHex(signedTx.serialize().toString('hex')));
-          return callback(null, '0x');
         });
       }
     }

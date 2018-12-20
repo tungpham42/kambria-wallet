@@ -13,10 +13,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 require("@babel/polyfill"); // To fix  error 'regeneratorRuntime is not defined'
 
 var util = require('../util');
-
 var error = require('../error');
 var _default = require('./defaultConst');
 
+/**
+ * Hardwallet type
+ */
 var Ledger = function Ledger() {};
 
 Ledger.getAddress = function (dpath, callback) {

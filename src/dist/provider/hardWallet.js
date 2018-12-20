@@ -61,17 +61,13 @@ var HardWallet = function () {
         signTransaction: function signTransaction(txParams, callback) {
           txParams.chainId = self.network;
           var tx = util.genRawTx(txParams, self.network);
-          console.log(txParams, tx.raw);
           self.hardware.signTransaction(self.dpath, util.unpadHex(tx.hex), function (er, signature) {
             if (er) return callback(er, null);
-            console.log(signature);
             var signedTx = tx.raw;
             signedTx.v = Buffer.from(signature.v, 'hex');
             signedTx.r = Buffer.from(signature.r, 'hex');
             signedTx.s = Buffer.from(signature.s, 'hex');
-            console.log(util.padHex(signedTx.serialize().toString('hex')));
             return callback(null, util.padHex(signedTx.serialize().toString('hex')));
-            return callback(null, '0x');
           });
         }
       };

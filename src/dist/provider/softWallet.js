@@ -58,6 +58,7 @@ var SoftWallet = function () {
           return callback(null, true);
         },
         signTransaction: function signTransaction(txParams, callback) {
+          txParams.chainId = self.network;
           var passphrase = self.getPassphrase();
           if (!passphrase) return callback(error.CANNOT_UNLOCK_ACCOUNT, null);
           var priv = self._unlockAccount(passphrase);
