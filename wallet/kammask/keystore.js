@@ -1,6 +1,9 @@
 var ethWallet = require('ethereumjs-wallet');
 var util = require('../util');
 
+/**
+ * Softwallet type
+ */
 var Keystore = function () { }
 
 Keystore.fromV1 = function (input, password) {

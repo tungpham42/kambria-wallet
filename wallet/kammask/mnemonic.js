@@ -2,10 +2,11 @@ var ethUtil = require('ethereumjs-util');
 var bip39 = require('bip39');
 var HDKey = require('hdkey');
 var util = require('../util');
-
 const _default = require('./defaultConst');
 
-
+/**
+ * Softwallet type
+ */
 var Mnemonic = function () { }
 
 Mnemonic.mnemonicToSeed = function (mnemonic, password) {

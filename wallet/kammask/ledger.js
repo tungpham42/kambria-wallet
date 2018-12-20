@@ -2,12 +2,13 @@ require("@babel/polyfill"); // To fix  error 'regeneratorRuntime is not defined'
 
 import Eth from "@ledgerhq/hw-app-eth";
 import TransportU2F from "@ledgerhq/hw-transport-u2f";
-
 var util = require('../util');
-
 const error = require('../error');
 const _default = require('./defaultConst');
 
+/**
+ * Hardwallet type
+ */
 var Ledger = function () { }
 
 Ledger.getAddress = function (dpath, callback) {
