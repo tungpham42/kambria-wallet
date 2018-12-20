@@ -4,7 +4,10 @@ import ABI from './ABI.json';
 import Kammask from 'dist/kammask';
 
 const NETWORK = 'rinkeby';
-const ACCOUNTS = ['0x76d8B624eFDDd1e9fC4297F82a2689315ac62d82', '0x5a926B235e992d6BA52d98415E66aFe5078A1690'];
+const TYPE = 'hardwallet';
+const ACCOUNTS = TYPE === 'hardwallet' ?
+  ['0x09e64b88cd3cb0b7aa2590477e1dd31ce3d508ec', '0x5a926B235e992d6BA52d98415E66aFe5078A1690'] :
+  ['0x76d8B624eFDDd1e9fC4297F82a2689315ac62d82', '0x5a926B235e992d6BA52d98415E66aFe5078A1690'];
 const TEST_DATA = {
   from: ACCOUNTS[0],
   to: ACCOUNTS[1],
@@ -42,10 +45,11 @@ class TestKammask extends Component {
       TXID: 0
     }
 
-    this.kammask = new Kammask(NETWORK);
+    this.kammask = new Kammask(NETWORK, TYPE);
 
-    this.kammask.setAccountByMnemonic(accOpts.mnemonic, accOpts.password, null, 0, accOpts.passphrase);
+    // this.kammask.setAccountByMnemonic(accOpts.mnemonic, accOpts.password, null, 0, accOpts.passphrase);
     // this.kammask.setAccountByKeystore(accOpts.keystore, accOpts.password, accOpts.version, accOpts.passphrase);
+    this.kammask.setAccountByLedger();
 
     this.kammask.web3.eth.getCoinbase(function (er, re) {
       if (er) return self.setState({ ERROR: er.toString() });
@@ -55,6 +59,7 @@ class TestKammask extends Component {
     });
     this.INSTANCE = this.kammask.web3.eth.contract(CONTRACT.ABI).at(CONTRACT.ADDRESS);
 
+    // Event listener
     this.INSTANCE.Next(function (er, re) {
       if (er) return self.setState({ ERROR: er.toString() });
       return self.setState({ FIBONACCI: re.args.b.toString() });
@@ -63,8 +68,8 @@ class TestKammask extends Component {
 
   confirmUser(callback) {
     var passphrase = window.prompt('Please enter passphrase:');
-    this.kammask.provider.setPassphrase(passphrase);
-    callback();
+    if (TYPE === 'softwallet') this.kammask.provider.unlockAccount(passphrase);
+    return callback();
   }
 
   getBalance(address) {

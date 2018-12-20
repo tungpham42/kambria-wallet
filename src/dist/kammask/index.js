@@ -8,24 +8,37 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var async = require("async");
+var util = require('../util');
 var Provider = require('../provider');
 var Mnemonic = require('./mnemonic');
 var Keystore = require('./keystore');
 var Ledger = require('./ledger');
 
+var HARD = 'hardwallet';
+var SOFT = 'softwallet';
+
 var Kammask = function () {
-  function Kammask(net) {
+  function Kammask(net, type) {
     _classCallCheck(this, Kammask);
 
     this.net = net;
     this.provider = null;
     this.web3 = null;
+    this.type = type === HARD ? HARD : SOFT;
   }
 
+  /**
+   * @func setWallet
+   * (Internal function) Set up acc to store that can be used as a wallet
+   * @param {*} accOpts 
+   */
+
+
   _createClass(Kammask, [{
-    key: 'setAccount',
-    value: function setAccount(accOpts) {
-      this.provider = new Provider.SoftWallet(this.net, accOpts);
+    key: 'setWallet',
+    value: function setWallet(accOpts) {
+      this.provider = this.type === HARD ? new Provider.HardWallet(this.net, accOpts) : new Provider.SoftWallet(this.net, accOpts);
       this.web3 = this.provider.web3;
     }
 
@@ -75,7 +88,7 @@ var Kammask = function () {
       var hdk = Mnemonic.seedToHDKey(seed);
       var account = Mnemonic.hdkeyToAccount(hdk, path, i);
       account.passphrase = passphrase;
-      this.setAccount(account);
+      this.setWallet(account);
     }
 
     /**
@@ -134,7 +147,69 @@ var Kammask = function () {
         account = Keystore.fromV3(input, password);
       }
       account.passphrase = passphrase;
-      this.setAccount(account);
+      this.setWallet(account);
+    }
+
+    /**
+     * LEDGER
+     */
+
+    /**
+     * @func setAccountByLedger
+     * Set account by ledger
+     * @param {*} dpath - (optional)
+     * @param {*} index - (optional)
+     */
+
+  }, {
+    key: 'setAccountByLedger',
+    value: function setAccountByLedger(dpath, index) {
+      var account = {
+        getAddress: Ledger.getAddress,
+        signTransaction: Ledger.signTransaction,
+        dpath: dpath,
+        index: index
+      };
+      this.setWallet(account);
+    }
+
+    /**
+     * @func getAccountsByLedger
+     * Get list of accounts by ledger
+     * @param {*} dpath 
+     * @param {*} limit 
+     * @param {*} page 
+     */
+
+  }, {
+    key: 'getAccountsByLedger',
+    value: function getAccountsByLedger(dpath, limit, page, callback) {
+      var list = [];
+      var coll = [];
+
+      for (var index = page; index < page + limit; index++) {
+        coll.push(index);
+      }
+
+      var done = function done(er) {
+        if (er) return callback(er, null);
+        return callback(null, list);
+      };
+
+      if (!dpath) {
+        return callback(null, []);
+      } else if (coll.length > 0) {
+        async.eachSeries(coll, function (i, cb) {
+          dpath = util.addDPath(dpath, i);
+          Ledger.getAddress(dpath, function (er, addr) {
+            if (er) return cb(er);
+            if (addr) list.push(addr);
+            return cb();
+          });
+        }, done);
+      } else {
+        return callback(null, []);
+      }
     }
   }]);
 

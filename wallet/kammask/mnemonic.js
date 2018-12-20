@@ -3,9 +3,10 @@ var bip39 = require('bip39');
 var HDKey = require('hdkey');
 var util = require('../util');
 
-var Mnemonic = function () { }
+const _default = require('./defaultConst');
 
-const DEFAULT_ETH_DERIVATION_PATH = "m/44'/60'/0'/0";
+
+var Mnemonic = function () { }
 
 Mnemonic.mnemonicToSeed = function (mnemonic, password) {
   if (!bip39.validateMnemonic(mnemonic)) {
@@ -23,9 +24,9 @@ Mnemonic.seedToHDKey = function (seed) {
   return HDKey.fromMasterSeed(seed);
 }
 
-Mnemonic.hdkeyToAddress = function (hdkey, path, index) {
-  path = path || DEFAULT_ETH_DERIVATION_PATH;
-  var dpath = path + '/' + index;
+Mnemonic.hdkeyToAddress = function (hdkey, dpath, index) {
+  dpath = dpath || _default.ETH_DERIVATION_PATH;
+  dpath = util.addDPath(dpath, index);;
   var child = hdkey.derive(dpath);
   if (child.publicKey) var addr = ethUtil.pubToAddress(child.publicKey, true /** multi pub-format */);
   else if (child.publicKey) var addr = ethUtil.privateToAddress(child.publicKey);
@@ -33,9 +34,9 @@ Mnemonic.hdkeyToAddress = function (hdkey, path, index) {
   return util.padHex(addr.toString('hex'));
 }
 
-Mnemonic.hdkeyToAccount = function (hdkey, path, index) {
-  path = path || DEFAULT_ETH_DERIVATION_PATH;
-  var dpath = path + '/' + index;
+Mnemonic.hdkeyToAccount = function (hdkey, dpath, index) {
+  dpath = dpath || _default.ETH_DERIVATION_PATH;
+  dpath = util.addDPath(dpath, index);;
   var child = hdkey.derive(dpath);
   var priv = child.privateKey;
   var addr = ethUtil.privateToAddress(priv);

@@ -4,11 +4,25 @@ var util = require('../util');
 
 const error = require('../error');
 
-class HardWallet{
-  constructor(net) {
-    var engine = new Engine(net, this.opts());
+class HardWallet {
+  /**
+   * @constructor
+   * @param {*} net - chainCode
+   * @param {*} accOpts - accOpts = {
+   *   signTransaction: (function) ...
+   *   getAddress: (function) ...
+   *   dpath: (optional) ...
+   *   index: (optional) ...
+   * }
+   */
+  constructor(net, accOpts) {
+    accOpts = accOpts || {};
+    this.network = util.chainCode(net);
+    var engine = new Engine(this.network, this.opts());
     this.store = new Store();
-    var ok = this.setAccount();
+    this.hardware = null;
+    this.dpath = util.addDPath(accOpts.dpath, accOpts.index);
+    var ok = this.setAccount(accOpts.getAddress, accOpts.signTransaction);
     if (!ok) throw new Error(error.CANNOT_SET_ACCOUNT);
     this.web3 = engine.web3;
   }
@@ -21,18 +35,29 @@ class HardWallet{
     var self = this;
     return {
       dataHandler: function () { /* Turn off default logs */ },
-      errorHandler: function () { /* Turn off dÎefault logs */ },
+      errorHandler: function () { /* Turn off default logs */ },
       getAccounts: function (callback) {
-        var accounts = self.getAddress();
-        return callback(null, accounts);
+        self.hardware.getAddress(self.dpath, function (er, addr) {
+          if (er) return callback(er, null);
+          if (!addr) return callback(null, []);
+          return callback(null, [addr.toLowerCase()]);
+        })
       },
       approveTransaction: function (txParams, callback) {
-        // Sign and save rawTx here
         return callback(null, true);
       },
       signTransaction: function (txParams, callback) {
-        // Read and validate signedTx here
-        return callback(null, signedTx);
+        txParams.chainId = self.network;
+        var tx = util.genRawTx(txParams, self.network);
+        self.hardware.signTransaction(self.dpath, util.unpadHex(tx.hex), function (er, signature) {
+          if (er) return callback(er, null);
+          var signedTx = tx.raw;
+          signedTx.v = Buffer.from(signature.v, 'hex');
+          signedTx.r = Buffer.from(signature.r, 'hex');
+          signedTx.s = Buffer.from(signature.s, 'hex');
+          return callback(null, util.padHex(signedTx.serialize().toString('hex')));
+          return callback(null, '0x');
+        });
       }
     }
   }
@@ -40,34 +65,21 @@ class HardWallet{
   /**
    * @func setAccount
    * Set up coinbase
+   * @param {*} address 
    */
-  setAccount() {
-    var address = null; // get address from hardware here
-    if (!address) {
-      console.error('Passphrase must be not null');
+  setAccount(getAddress, signTransaction) {
+    if (!getAddress || typeof getAddress !== 'function') {
+      console.error('getAddress must be a function');
       return false;
     }
-    address = address.toLowerCase();
-    privateKey = privateKey.toLowerCase();
-    passphrase = passphrase.toString();
-    if (!this.validatePrivateKey(address, privateKey)) {
-      console.error('Invalid address or private key');
+    if (!signTransaction || typeof signTransaction !== 'function') {
+      console.error('signTransaction must be a function');
       return false;
     }
-    var salt = cryptoJS.lib.WordArray.random(128 / 8);
-    var password = this.constructPassword(passphrase, salt);
-    if (!password) {
-      console.error('Cannot set up password');
-      return false;
-    }
-    var encryptedPriv = aes.encrypt(privateKey, password).toString();
-    this.store.set('ACCOUNT', {
-      ADDRESS: address,
-      PRIVATEKEY: encryptedPriv,
-      PASSPHRASE: null,
-      SALT: salt
-    });
-    return true;
-  }
 
+    this.hardware = { getAddress: getAddress, signTransaction: signTransaction };
+    return true
+  }
 }
+
+module.exports = HardWallet;

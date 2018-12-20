@@ -1,18 +1,30 @@
+var async = require("async");
+var util = require('../util');
 var Provider = require('../provider');
 var Mnemonic = require('./mnemonic');
 var Keystore = require('./keystore');
 var Ledger = require('./ledger');
 
+const HARD = 'hardwallet';
+const SOFT = 'softwallet';
+
 class Kammask {
 
-  constructor(net) {
+  constructor(net, type) {
     this.net = net;
     this.provider = null;
     this.web3 = null;
+    this.type = type === HARD ? HARD : SOFT;
   }
 
-  setAccount(accOpts){
-    this.provider = new Provider.SoftWallet(this.net, accOpts);
+  /**
+   * @func setWallet
+   * (Internal function) Set up acc to store that can be used as a wallet
+   * @param {*} accOpts 
+   */
+  setWallet(accOpts) {
+    this.provider = this.type === HARD ?
+      new Provider.HardWallet(this.net, accOpts) : new Provider.SoftWallet(this.net, accOpts);
     this.web3 = this.provider.web3;
   }
 
@@ -59,7 +71,7 @@ class Kammask {
     var hdk = Mnemonic.seedToHDKey(seed);
     var account = Mnemonic.hdkeyToAccount(hdk, path, i);
     account.passphrase = passphrase;
-    this.setAccount(account);
+    this.setWallet(account);
   }
 
   /**
@@ -72,7 +84,7 @@ class Kammask {
    * @param {*} page - index of page
    */
   getAccountsByMnemonic(mnemonic, password, path, limit, page) {
-    var list = []
+    var list = [];
     for (var i = page; i < page + limit; i++) {
       var seed = Mnemonic.mnemonicToSeed(mnemonic, password)
       var hdk = Mnemonic.seedToHDKey(seed);
@@ -113,7 +125,65 @@ class Kammask {
       account = Keystore.fromV3(input, password);
     }
     account.passphrase = passphrase;
-    this.setAccount(account);
+    this.setWallet(account);
+  }
+
+
+  /**
+   * LEDGER
+   */
+
+  /**
+   * @func setAccountByLedger
+   * Set account by ledger
+   * @param {*} dpath - (optional)
+   * @param {*} index - (optional)
+   */
+  setAccountByLedger(dpath, index) {
+    var account = {
+      getAddress: Ledger.getAddress,
+      signTransaction: Ledger.signTransaction,
+      dpath: dpath,
+      index: index
+    }
+    this.setWallet(account);
+  }
+
+  /**
+   * @func getAccountsByLedger
+   * Get list of accounts by ledger
+   * @param {*} dpath 
+   * @param {*} limit 
+   * @param {*} page 
+   */
+  getAccountsByLedger(dpath, limit, page, callback) {
+    var list = [];
+    var coll = [];
+
+    for (var index = page; index < page + limit; index++) {
+      coll.push(index);
+    }
+
+    var done = function (er) {
+      if (er) return callback(er, null);
+      return callback(null, list);
+    }
+
+    if (!dpath) {
+      return callback(null, []);
+    } else if (coll.length > 0) {
+      async.eachSeries(coll, function (i, cb) {
+        dpath = util.addDPath(dpath, i);
+        Ledger.getAddress(dpath, function (er, addr) {
+          if (er) return cb(er);
+          if (addr) list.push(addr);
+          return cb();
+        });
+      }, done);
+    }
+    else {
+      return callback(null, []);
+    }
   }
 
 }

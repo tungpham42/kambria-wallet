@@ -2,21 +2,45 @@ require("@babel/polyfill"); // To fix  error 'regeneratorRuntime is not defined'
 
 import Eth from "@ledgerhq/hw-app-eth";
 import TransportU2F from "@ledgerhq/hw-transport-u2f";
-import { callbackify } from "util";
-const error = require('../error');
+
 var util = require('../util');
 
-const DEFAULT_ETH_DERIVATION_PATH = "m/44'/60'/0'/0";
-const TIMEOUT = 3000;
+const error = require('../error');
+const _default = require('./defaultConst');
 
 var Ledger = function () { }
 
-Ledger.sign = function (txParams, callback) {
+Ledger.getAddress = function (dpath, callback) {
+  dpath = dpath || util.addDPath(_default.ETH_DERIVATION_PATH, _default.ACCOUNT_INDEX);
   Ledger.getTransport(function (er, transport) {
-    if (er || !transport) return console.error(error.UNSUPPORT_U2F);
+    if (er) return callback(er, null);
+    if (!transport) return callback(error.UNSUPPORT_U2F, null);
+
 
     var eth = new Eth(transport);
-    return callback(null, eth);
+    eth.getAddress(dpath, false, false).then(re => {
+      if (!re || !re.address) return callback(error.CANNOT_CONNECT_HARDWARE, null);
+      return callback(null, re.address);
+    }).catch(er => {
+      return callback(er, null);
+    });
+  });
+}
+
+Ledger.signTransaction = function (dpath, rawTx, callback) {
+  dpath = dpath || util.addDPath(_default.ETH_DERIVATION_PATH, _default.ACCOUNT_INDEX);
+  if (!rawTx) return callback(error.INVALID_TX, null);
+  Ledger.getTransport(function (er, transport) {
+    if (er) return callback(er, null);
+    if (!transport) return callback(error.UNSUPPORT_U2F, null);
+
+    var eth = new Eth(transport);
+    eth.signTransaction(dpath, rawTx).then(re => {
+      if (!re) return callback(error.CANNOT_CONNECT_HARDWARE, null);
+      return callback(null, re);
+    }).catch(er => {
+      return callback(er, null);
+    });
   });
 }
 
@@ -25,14 +49,14 @@ Ledger.getTransport = function (callback) {
     if (!re) {
       return callback(error.UNSUPPORT_U2F, null);
     }
-    TransportU2F.create(TIMEOUT, TIMEOUT).then(re => {
+    TransportU2F.create(_default.TIMEOUT, _default.TIMEOUT).then(re => {
       return callback(null, re);
     }).catch(er => {
       return callback(er, null);
     });
   }).catch(er => {
     return callback(er, null);
-  })
+  });
 }
 
 module.exports = Ledger;

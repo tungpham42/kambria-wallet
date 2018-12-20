@@ -8,26 +8,47 @@ var _hwTransportU2f = require("@ledgerhq/hw-transport-u2f");
 
 var _hwTransportU2f2 = _interopRequireDefault(_hwTransportU2f);
 
-var _util = require("util");
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 require("@babel/polyfill"); // To fix  error 'regeneratorRuntime is not defined'
 
-var error = require('../error');
 var util = require('../util');
 
-var DEFAULT_ETH_DERIVATION_PATH = "m/44'/60'/0'/0";
-var TIMEOUT = 3000;
+var error = require('../error');
+var _default = require('./defaultConst');
 
 var Ledger = function Ledger() {};
 
-Ledger.sign = function (txParams, callback) {
+Ledger.getAddress = function (dpath, callback) {
+  dpath = dpath || util.addDPath(_default.ETH_DERIVATION_PATH, _default.ACCOUNT_INDEX);
   Ledger.getTransport(function (er, transport) {
-    if (er || !transport) return console.error(error.UNSUPPORT_U2F);
+    if (er) return callback(er, null);
+    if (!transport) return callback(error.UNSUPPORT_U2F, null);
 
     var eth = new _hwAppEth2.default(transport);
-    return callback(null, eth);
+    eth.getAddress(dpath, false, false).then(function (re) {
+      if (!re || !re.address) return callback(error.CANNOT_CONNECT_HARDWARE, null);
+      return callback(null, re.address);
+    }).catch(function (er) {
+      return callback(er, null);
+    });
+  });
+};
+
+Ledger.signTransaction = function (dpath, rawTx, callback) {
+  dpath = dpath || util.addDPath(_default.ETH_DERIVATION_PATH, _default.ACCOUNT_INDEX);
+  if (!rawTx) return callback(error.INVALID_TX, null);
+  Ledger.getTransport(function (er, transport) {
+    if (er) return callback(er, null);
+    if (!transport) return callback(error.UNSUPPORT_U2F, null);
+
+    var eth = new _hwAppEth2.default(transport);
+    eth.signTransaction(dpath, rawTx).then(function (re) {
+      if (!re) return callback(error.CANNOT_CONNECT_HARDWARE, null);
+      return callback(null, re);
+    }).catch(function (er) {
+      return callback(er, null);
+    });
   });
 };
 
@@ -36,7 +57,7 @@ Ledger.getTransport = function (callback) {
     if (!re) {
       return callback(error.UNSUPPORT_U2F, null);
     }
-    _hwTransportU2f2.default.create(TIMEOUT, TIMEOUT).then(function (re) {
+    _hwTransportU2f2.default.create(_default.TIMEOUT, _default.TIMEOUT).then(function (re) {
       return callback(null, re);
     }).catch(function (er) {
       return callback(er, null);

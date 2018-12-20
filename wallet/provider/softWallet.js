@@ -8,8 +8,19 @@ var util = require('../util');
 const error = require('../error');
 
 class SoftWallet {
+  /**
+   * @constructor
+   * @param {*} net - chainCode
+   * @param {*} accOpts - accOpts = {
+   *   address: ...
+   *   privateKey: ...
+   *   passphrase: ...
+   * }
+   */
   constructor(net, accOpts) {
-    var engine = new Engine(net, this.opts());
+    accOpts = accOpts || {};
+    this.network = util.chainCode(net);
+    var engine = new Engine(this.network, this.opts());
     this.store = new Store();
     var ok = this.setAccount(accOpts.address, accOpts.privateKey, accOpts.passphrase);
     if (!ok) throw new Error(error.CANNOT_SET_ACCOUNT);
@@ -34,9 +45,9 @@ class SoftWallet {
       },
       signTransaction: function (txParams, callback) {
         var passphrase = self.getPassphrase();
-        if (!passphrase) return callback('User denied signing the transaction.', null);
-        var priv = self.unlockAccount(passphrase);
-        if (!priv) return callback('Cannot unlock account.', null);
+        if (!passphrase) return callback(error.CANNOT_UNLOCK_ACCOUNT, null);
+        var priv = self._unlockAccount(passphrase);
+        if (!priv) return callback(error.CANNOT_UNLOCK_ACCOUNT, null);
         var signedTx = util.signRawTx(txParams, priv);
         return callback(null, signedTx);
       }
@@ -103,6 +114,7 @@ class SoftWallet {
     var acc = this.store.get('ACCOUNT');
     acc.PASSPHRASE = passphrase;
     this.store.set('ACCOUNT', acc);
+    return true;
   }
 
   /**
@@ -118,10 +130,20 @@ class SoftWallet {
   }
 
   /**
-   * @func unlockAccount
-   * Return private key in plain
+   * @function unlockAccount
+   * Public interface, that user can use to unlock account by inputing passphrase
+   * @param {*} passphrase 
    */
   unlockAccount(passphrase) {
+    return this.setPassphrase(passphrase);
+  }
+
+  /**
+   * @func _unlockAccount
+   * Internal function, that acctually does unlocking acc.
+   * @param {*} passphrase 
+   */
+  _unlockAccount(passphrase) {
     var password = this.constructPassword(passphrase, this.getSalt());
     var enpriv = this.getPrivateKey();
     if (!password || !enpriv) return null;
