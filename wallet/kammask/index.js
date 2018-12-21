@@ -1,6 +1,7 @@
 var async = require("async");
 var util = require('../util');
 var Provider = require('../provider');
+var Privatekey = require('./privatekey');
 var Mnemonic = require('./mnemonic');
 var Keystore = require('./keystore');
 var Ledger = require('./ledger');
@@ -27,6 +28,30 @@ class Kammask {
       new Provider.HardWallet(this.net, accOpts) : new Provider.SoftWallet(this.net, accOpts);
     this.web3 = this.provider.web3;
   }
+
+  /**
+   * PRIVATE KEY
+   */
+
+  /**
+   * @func setAccountByPrivatekey
+   * Set account by private key. (Do not recommend to use)
+   * This function is using private key in direct. Eventhought it was secured by 
+   * some cryptographical functions, but we strongly recommend to avoid using it in the
+   * production environment.
+   * @param {*} privatekey 
+   * @param {*} passphrase 
+   */
+  setAccountByPrivatekey(privatekey, passphrase) {
+    console.warn(`ATTENTION:
+    This function is using private key in direct.
+    Eventhought it was secured by some cryptographical functions,
+    but we strongly recommend to avoid using it in the production environment.`);
+    var account = Privatekey.privatekeyToAccount(privatekey);
+    account.passphrase = passphrase;
+    this.setWallet(account);
+  }
+
 
   /**
    * MNEMONIC / HDKEY
