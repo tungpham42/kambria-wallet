@@ -7,8 +7,7 @@
     "start": "HTTPS=true REACT_APP_ENV=development react-scripts start",
     "build": "npm run clean && babel wallet -d dist && babel export.js -o index.js",
     "test": "npm run build && cp -R dist src/dist && npm start",
-    "clean": "rm -rf dist && rm -rf ./src/dist && rm -rf index.js",
-    "provider": "nodemon --exec babel-node ./wallet/provider/index.js"
+    "clean": "rm -rf dist && rm -rf ./src/dist && rm -rf index.js"
   },
   "author": "tphanson <tphanson@kambria.io>",
   "license": "ISC",
