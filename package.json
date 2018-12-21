@@ -1,5 +1,5 @@
 {
-  "name": "kambria-wallet",
+  "name": "@kambria/kambria-wallet",
   "version": "1.0.1",
   "description": "",
   "main": "index.js",
