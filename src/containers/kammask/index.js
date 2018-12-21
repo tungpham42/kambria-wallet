@@ -68,6 +68,7 @@ class TestKammask extends Component {
 
   confirmUser(callback) {
     var passphrase = window.prompt('Please enter passphrase:');
+    if (!passphrase) return console.error('User denied signing transaction');
     if (TYPE === 'softwallet') this.kammask.provider.unlockAccount(passphrase);
     return callback();
   }
