@@ -74,7 +74,7 @@ Or copy that, put it somewhere in your project and import it to use. You can ref
 ```
 import React, { Component } from 'react';
 
-import {Metamask, Kammask} from '@kambria/krambria-wallet';
+import {Metamask, Kammask} from '@kambria/kambria-wallet';
 
 const NETWORK = 'rinkeby';
 const TYPE = 'softwallet';

@@ -2,4 +2,5 @@
 /wallet
 /src
 /public
+export.js
 .npmrc
