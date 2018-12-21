@@ -213,4 +213,4 @@ class Kammask {
 
 }
 
-export default Kammask;
+module.exports = Kammask;

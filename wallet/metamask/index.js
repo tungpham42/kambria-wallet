@@ -165,4 +165,4 @@ class Metamask {
   }
 }
 
-export default Metamask;
+module.exports = Metamask;
