@@ -119,11 +119,11 @@ class TestKammask extends Component {
         <p>Account: {this.state.ADDRESS}</p>
         <p>Balance: {this.state.BALANCE} wei</p>
         <p>Fibonacci: {this.state.FIBONACCI}</p>
-        <p>Previous tx id: {this.state.TXID}</p>
+        <p>Previous tx id: <a target="_blank" rel="noopener noreferrer" href={"https://rinkeby.etherscan.io/tx/" + this.state.TXID}>{this.state.TXID}</a></p>
         <button onClick={() => this.sendTx()}>Transfer</button>
         <button onClick={() => this.initFibonacci()}>initFibonacci</button>
         <button onClick={() => this.getFibonacci()}>getFibonacci</button>
-        {this.state.ERROR ? <p>{this.state.ERROR}</p> : null}
+        {this.state.ERROR ? <a >{this.state.ERROR}</a> : null}
       </div>
     );
   }
