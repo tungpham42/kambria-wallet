@@ -102,9 +102,9 @@ class Kammask {
   /**
    * @func getAccountsByMnemonic
    * Get list of accounts by mnemonic
-   * @param {*} mnemonic 
-   * @param {*} password 
-   * @param {*} path 
+   * @param {*} mnemonic - 12 words 
+   * @param {*} password - (optional) password
+   * @param {*} path - derivation path (m/44'/60'/0'/0 as default)
    * @param {*} limit - the number of record per page
    * @param {*} page - index of page
    */

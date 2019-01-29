@@ -16,7 +16,7 @@ Keystore.fromV1 = function (input, password) {
 }
 
 Keystore.fromV3 = function (input, password) {
-  var wallet = ethWallet.fromV3(input, password, true /** non-strict */);
+  var wallet = ethWallet.fromV3(input, password, true /* non-strict */);
   var account = {
     address: util.padHex(wallet.getAddress()),
     privateKey: wallet.getPrivateKey().toString('hex')

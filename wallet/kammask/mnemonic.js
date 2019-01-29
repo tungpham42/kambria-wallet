@@ -29,7 +29,7 @@ Mnemonic.hdkeyToAddress = function (hdkey, dpath, index) {
   dpath = dpath || _default.ETH_DERIVATION_PATH;
   dpath = util.addDPath(dpath, index);;
   var child = hdkey.derive(dpath);
-  if (child.publicKey) var addr = ethUtil.pubToAddress(child.publicKey, true /** multi pub-format */);
+  if (child.publicKey) var addr = ethUtil.pubToAddress(child.publicKey, true /* multi pub-format */);
   else if (child.publicKey) var addr = ethUtil.privateToAddress(child.publicKey);
   else return null;
   return util.padHex(addr.toString('hex'));
