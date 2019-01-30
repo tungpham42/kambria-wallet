@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ABI from './ABI.json';
 
-import Kammask from 'dist/kammask';
+import { Isoxys } from '@kambria/kambria-wallet';
 
 const NETWORK = 'rinkeby';
 const TYPE = 'softwallet';
@@ -17,22 +17,26 @@ const accOpts = {
   mnemonic: 'expand lake video put crowd pioneer slam mushroom damage middle column neutral',
   password: null,
   path: null,
-  i: 0,
-  passphrase: '123'
+  i: 0
 }
 // const accOpts = {
 //   keystore: {"version":3,"id":"d01f6097-3db6-4d22-ba09-b7b251ded8cd","address":"76d8b624efddd1e9fc4297f82a2689315ac62d82","crypto":{"ciphertext":"4c5e75f03b42b2b0725f1947bc11309e609e77fc43aed7cfeae582ad0d67aa39","cipherparams":{"iv":"26ee2815b902aa8a14d2e772317ccabe"},"cipher":"aes-128-ctr","kdf":"scrypt","kdfparams":{"dklen":32,"salt":"8be6b0db33659119737ecc8912de8f0296afdd6ddc9b336ad7856a62b47c3d40","n":262144,"r":8,"p":1},"mac":"00d21e647990dc4085983d332ed63bec6fcfd9e923b1d305a2412f396b9b08bd"}},
 //   password: '123',
-//   version: 3,
-//   passphrase: '123'
+//   version: 3
 // }
+
+const getPassphrase = function (callback) {
+  var passphrase = window.prompt('Please enter passphrase:');
+  if (!passphrase) return callback('User denied signing transaction', null);
+  return callback(null, passphrase)
+}
 
 const CONTRACT = {
   ADDRESS: '0x6c095bf240c7b9b445a51c44733e2a5126b613a2',
   ABI: ABI
 }
 
-class TestKammask extends Component {
+class TestIsoxys extends Component {
   constructor() {
     super();
 
@@ -45,19 +49,19 @@ class TestKammask extends Component {
       TXID: 0
     }
 
-    this.kammask = new Kammask(NETWORK, TYPE);
+    this.isoxys = new Isoxys(NETWORK, TYPE);
 
-    this.kammask.setAccountByMnemonic(accOpts.mnemonic, accOpts.password, null, 0, accOpts.passphrase);
-    // this.kammask.setAccountByKeystore(accOpts.keystore, accOpts.password, accOpts.version, accOpts.passphrase);
-    // this.kammask.setAccountByLedger();
+    this.isoxys.setAccountByMnemonic(accOpts.mnemonic, accOpts.password, null, 0, getPassphrase);
+    // this.isoxys.setAccountByKeystore(accOpts.keystore, accOpts.password, accOpts.version, getPassphrase);
+    // this.isoxys.setAccountByLedger();
 
-    this.kammask.web3.eth.getCoinbase(function (er, re) {
+    this.isoxys.web3.eth.getCoinbase(function (er, re) {
       if (er) return self.setState({ ERROR: er.toString() });
       self.setState({ ADDRESS: re })
 
       self.getBalance(re);
     });
-    this.INSTANCE = this.kammask.web3.eth.contract(CONTRACT.ABI).at(CONTRACT.ADDRESS);
+    this.INSTANCE = this.isoxys.web3.eth.contract(CONTRACT.ABI).at(CONTRACT.ADDRESS);
 
     // Event listener
     this.INSTANCE.Next(function (er, re) {
@@ -66,16 +70,9 @@ class TestKammask extends Component {
     });
   }
 
-  confirmUser(callback) {
-    var passphrase = window.prompt('Please enter passphrase:');
-    if (!passphrase) return console.error('User denied signing transaction');
-    if (TYPE === 'softwallet') this.kammask.provider.unlockAccount(passphrase);
-    return callback();
-  }
-
   getBalance(address) {
     var self = this;
-    this.kammask.web3.eth.getBalance(address, function (er, re) {
+    this.isoxys.web3.eth.getBalance(address, function (er, re) {
       if (er) return self.setState({ ERROR: er.toString() });
       return self.setState({ BALANCE: re.toString() });
     });
@@ -83,38 +80,32 @@ class TestKammask extends Component {
 
   sendTx() {
     var self = this;
-    this.confirmUser(function () {
-      self.kammask.web3.eth.sendTransaction(TEST_DATA, function (er, txId) {
-        if (er) return self.setState({ ERROR: JSON.stringify(er) });
-        return self.setState({ TXID: txId.toString() });
-      });
+    self.isoxys.web3.eth.sendTransaction(TEST_DATA, function (er, txId) {
+      if (er) return self.setState({ ERROR: JSON.stringify(er) });
+      return self.setState({ TXID: txId.toString() });
     });
   }
 
   initFibonacci() {
     var self = this;
-    this.confirmUser(function () {
-      self.INSTANCE.init(1, 2, { from: ACCOUNTS[0] }, function (er, txId) {
-        if (er) return self.setState({ ERROR: JSON.stringify(er) });
-        return self.setState({ TXID: txId.toString() });
-      });
+    self.INSTANCE.init(1, 2, { from: ACCOUNTS[0] }, function (er, txId) {
+      if (er) return self.setState({ ERROR: JSON.stringify(er) });
+      return self.setState({ TXID: txId.toString() });
     });
   }
 
   getFibonacci() {
     var self = this;
-    this.confirmUser(function () {
-      self.INSTANCE.next({ from: ACCOUNTS[0] }, function (er, txId) {
-        if (er) return self.setState({ ERROR: er.toString() });
-        return self.setState({ TXID: txId.toString() });
-      });
+    self.INSTANCE.next({ from: ACCOUNTS[0] }, function (er, txId) {
+      if (er) return self.setState({ ERROR: er.toString() });
+      return self.setState({ TXID: txId.toString() });
     });
   }
 
   render() {
     return (
       <div>
-        <h1>Kammask testing</h1>
+        <h1>Isoxys testing</h1>
         <p>View console log for details</p>
         <p>Account: {this.state.ADDRESS}</p>
         <p>Balance: {this.state.BALANCE} wei</p>
@@ -129,4 +120,4 @@ class TestKammask extends Component {
   }
 }
 
-export default TestKammask;
+export default TestIsoxys;

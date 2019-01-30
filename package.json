@@ -1,14 +1,16 @@
 {
   "name": "@kambria/kambria-wallet",
-  "version": "1.0.2",
+  "version": "2.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "release": "npm run build && npm publish",
     "start": "HTTPS=true REACT_APP_ENV=development react-scripts start",
-    "build": "npm run clean && babel wallet -d dist",
-    "test": "npm run build && cp -R dist src/dist && npm start",
-    "clean": "rm -rf dist && rm -rf ./src/dist"
+    "build": "npm run clean && babel wallet -d dist && babel exports.js -o index.js",
+    "clean": "rm -rf dist && rm -rf index.js",
+    "test": "npm run pre-test && npm start",
+    "pre-test": "npm run build && npm run fake-module",
+    "fake-module": "rm -rf ./node_modules/@kambria && mkdir -p ./node_modules/@kambria/kambria-wallet && cp -R ./dist ./node_modules/@kambria/kambria-wallet/dist && cp ./index.js ./node_modules/@kambria/kambria-wallet/index.js"
   },
   "author": "tphanson <tphanson@kambria.io>",
   "license": "ISC",
@@ -29,6 +31,7 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1",
     "connected-react-router": "^6.0.0",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",

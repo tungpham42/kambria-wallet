@@ -14,17 +14,21 @@ class SoftWallet {
    * @param {*} accOpts - accOpts = {
    *   address: ...
    *   privateKey: ...
-   *   passphrase: ...
+   *   getPassphrase: ...
    * }
    */
   constructor(net, accOpts) {
+    var self = this;
+
     accOpts = accOpts || {};
     this.network = util.chainCode(net);
     var engine = new Engine(this.network, this.opts());
     this.store = new Store();
-    var ok = this.setAccount(accOpts.address, accOpts.privateKey, accOpts.passphrase);
-    if (!ok) throw new Error(error.CANNOT_SET_ACCOUNT);
-    this.web3 = engine.web3;
+    this.getPassphrase = accOpts.getPassphrase;
+    this.setAccount(accOpts.address, accOpts.privateKey, accOpts.getPassphrase, function (er, re) {
+      if (er) throw new Error(error.CANNOT_SET_ACCOUNT);
+      self.web3 = engine.web3;
+    });
   }
 
   /**
@@ -45,12 +49,13 @@ class SoftWallet {
       },
       signTransaction: function (txParams, callback) {
         txParams.chainId = self.network;
-        var passphrase = self.getPassphrase();
-        if (!passphrase) return callback(error.CANNOT_UNLOCK_ACCOUNT, null);
-        var priv = self._unlockAccount(passphrase);
-        if (!priv) return callback(error.CANNOT_UNLOCK_ACCOUNT, null);
-        var signedTx = util.signRawTx(txParams, priv);
-        return callback(null, signedTx);
+        self.getPassphrase(function (er, passphrase) {
+          if (er || !passphrase) return callback(error.CANNOT_UNLOCK_ACCOUNT, null);
+          var priv = self.unlockAccount(passphrase);
+          if (!priv) return callback(error.CANNOT_UNLOCK_ACCOUNT, null);
+          var signedTx = util.signRawTx(txParams, priv);
+          return callback(null, signedTx);
+        });
       }
     }
   }
@@ -58,36 +63,38 @@ class SoftWallet {
   /**
    * @func setAccount
    * Set up coinbase
-   * @param {*} address 
-   * @param {*} privateKey 
-   * @param {*} passphrase 
+   * @param {string} address 
+   * @param {string} privateKey 
+   * @param {function} passphrase 
    */
-  setAccount(address, privateKey, passphrase) {
-    if (!address || !privateKey || !passphrase) {
-      console.error('Passphrase must be not null');
-      return false;
-    }
+  setAccount(address, privateKey, getPassphrase, callback) {
+    var self = this;
+
+    if (!address || !privateKey) return callback('Address or Private Key must be not null', null);
+    if (!this.validatePrivateKey(address, privateKey)) return callback('Invalid address or private key', null);
+    if (!getPassphrase || typeof getPassphrase !== 'function') return callback('getPassphrase must be not a function', null);
+
     address = address.toLowerCase();
     privateKey = privateKey.toLowerCase();
-    passphrase = passphrase.toString();
-    if (!this.validatePrivateKey(address, privateKey)) {
-      console.error('Invalid address or private key');
-      return false;
-    }
-    var salt = cryptoJS.lib.WordArray.random(128 / 8);
-    var password = this.constructPassword(passphrase, salt);
-    if (!password) {
-      console.error('Cannot set up password');
-      return false;
-    }
-    var encryptedPriv = aes.encrypt(privateKey, password).toString();
-    this.store.set('ACCOUNT', {
-      ADDRESS: address,
-      PRIVATEKEY: encryptedPriv,
-      PASSPHRASE: null,
-      SALT: salt
+    getPassphrase(function (er, passphrase) {
+      if (er) return callback(er, null);
+      if (!passphrase) return callback(er, 'User denied unlocking account');
+
+      passphrase = passphrase.toString();
+      var salt = cryptoJS.lib.WordArray.random(128 / 8);
+      var password = self.constructPassword(passphrase, salt);
+      if (!password) return callback('Cannot set up password', null);
+
+      var encryptedPriv = aes.encrypt(privateKey, password).toString();
+      var acc = {
+        ADDRESS: address,
+        PRIVATEKEY: encryptedPriv,
+        SALT: salt
+      };
+
+      self.store.set('ACCOUNT', acc);
+      return callback(null, acc);
     });
-    return true;
   }
 
   /**
@@ -131,20 +138,11 @@ class SoftWallet {
   }
 
   /**
-   * @function unlockAccount
-   * Public interface, that user can use to unlock account by inputing passphrase
-   * @param {*} passphrase 
-   */
-  unlockAccount(passphrase) {
-    return this.setPassphrase(passphrase);
-  }
-
-  /**
-   * @func _unlockAccount
+   * @func unlockAccount
    * Internal function, that acctually does unlocking acc.
    * @param {*} passphrase 
    */
-  _unlockAccount(passphrase) {
+  unlockAccount(passphrase) {
     var password = this.constructPassword(passphrase, this.getSalt());
     var enpriv = this.getPrivateKey();
     if (!password || !enpriv) return null;
@@ -162,16 +160,7 @@ class SoftWallet {
     if (!acc || typeof acc !== 'object') return [];
     return [acc.ADDRESS];
   }
-  getPassphrase() {
-    var acc = this.store.get('ACCOUNT');
-    if (!acc || typeof acc !== 'object') return null;
-    var passphrase = acc.PASSPHRASE;
-    // For safety, everytime unlock account had done, it must be clear passphrase.
-    acc.PASSPHRASE = null;
-    this.store.set('ACCOUNT', acc);
-    return passphrase;
-  }
-  getPrivateKey() {
+  getPrivateKey() { // the encrypted form of private key
     var acc = this.store.get('ACCOUNT');
     if (!acc || typeof acc !== 'object') return null;
     return acc.PRIVATEKEY;

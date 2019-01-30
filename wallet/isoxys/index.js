@@ -6,16 +6,16 @@ var Mnemonic = require('./mnemonic');
 var Keystore = require('./keystore');
 var Ledger = require('./ledger');
 
-const HARD = 'hardwallet';
-const SOFT = 'softwallet';
+const CONST = require('../const');
 
-class Kammask {
+
+class Isoxys {
 
   constructor(net, type) {
     this.net = net;
     this.provider = null;
     this.web3 = null;
-    this.type = type === HARD ? HARD : SOFT;
+    this.type = type === CONST.HARDWALLET ? CONST.HARDWALLET : CONST.SOFTWALLET;
   }
 
   /**
@@ -24,7 +24,7 @@ class Kammask {
    * @param {*} accOpts 
    */
   setWallet(accOpts) {
-    this.provider = this.type === HARD ?
+    this.provider = this.type === CONST.HARDWALLET ?
       new Provider.HardWallet(this.net, accOpts) : new Provider.SoftWallet(this.net, accOpts);
     this.web3 = this.provider.web3;
   }
@@ -40,15 +40,15 @@ class Kammask {
    * some cryptographical functions, but we strongly recommend to avoid using it in the
    * production environment.
    * @param {*} privatekey 
-   * @param {*} passphrase 
+   * @param {function} getPassphrase 
    */
-  setAccountByPrivatekey(privatekey, passphrase) {
+  setAccountByPrivatekey(privatekey, getPassphrase) {
     console.warn(`ATTENTION:
     This function is using private key in direct.
     Eventhought it was secured by some cryptographical functions,
     but we strongly recommend to avoid using it in the production environment.`);
     var account = Privatekey.privatekeyToAccount(privatekey);
-    account.passphrase = passphrase;
+    account.getPassphrase = getPassphrase;
     this.setWallet(account);
   }
 
@@ -89,13 +89,13 @@ class Kammask {
    * m/44'/1171337'/0'/0: Network: Iolite (ILT)
    * 
    * @param {*} i - index of account
-   * @param {*} passphrase - temporary passphrase to simulate lock/unlock account 
+   * @param {function} getPassphrase - simulate the account locking/unlocking
    */
-  setAccountByMnemonic(mnemonic, password, path, i, passphrase) {
+  setAccountByMnemonic(mnemonic, password, path, i, getPassphrase) {
     var seed = Mnemonic.mnemonicToSeed(mnemonic, password)
     var hdk = Mnemonic.seedToHDKey(seed);
     var account = Mnemonic.hdkeyToAccount(hdk, path, i);
-    account.passphrase = passphrase;
+    account.getPassphrase = getPassphrase;
     this.setWallet(account);
   }
 
@@ -130,9 +130,9 @@ class Kammask {
    * @param {*} input - input object
    * @param {*} password - password
    * @param {*} v - version, ipnut 1 as v1, input 3 (default) as V3
-   * @param {*} passphrase - temporary passphrase to simulate lock/unlock account 
+   * @param {function} getPassphrase - simulate the account locking/unlocking 
    */
-  setAccountByKeystore(input, password, v, passphrase) {
+  setAccountByKeystore(input, password, v, getPassphrase) {
     var isFromV1 = false;
     switch (v) {
       case 1:
@@ -149,7 +149,7 @@ class Kammask {
     } else {
       account = Keystore.fromV3(input, password);
     }
-    account.passphrase = passphrase;
+    account.getPassphrase = getPassphrase;
     this.setWallet(account);
   }
 
@@ -213,4 +213,4 @@ class Kammask {
 
 }
 
-module.exports = Kammask;
+module.exports = Isoxys;

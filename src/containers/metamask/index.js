@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-import Metamask from 'dist/metamask';
+import { Metamask } from '@kambria/kambria-wallet';
 
 class TestMetamask extends Component {
   constructor() {

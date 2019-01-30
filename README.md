@@ -64,7 +64,7 @@ The `dist` folder contains all you need for creating your client node.
 
 * Using the lib by:
 ```
-import {Metamask, Kammask} from '@kambria/krambria-wallet';
+import {Metamask, Isoxys} from '@kambria/krambria-wallet';
 ```
 Or copy that, put it somewhere in your project and import it to use. You can refer the examples in the `src` folder for the detail.
 
@@ -74,7 +74,7 @@ Or copy that, put it somewhere in your project and import it to use. You can ref
 ```
 import React, { Component } from 'react';
 
-import {Metamask, Kammask} from '@kambria/kambria-wallet';
+import {Metamask, Isoxys} from '@kambria/kambria-wallet';
 
 const NETWORK = 'rinkeby';
 const TYPE = 'softwallet';
@@ -87,7 +87,7 @@ const accOpts = {
   passphrase: 'p@ssphr@se'
 }
 
-class TestKammask extends Component {
+class TestIsoxys extends Component {
   constructor() {
     super();
 
@@ -99,11 +99,11 @@ class TestKammask extends Component {
       TXID: 0
     }
 
-    this.kammask = new Kammask(NETWORK, TYPE);
+    this.isoxys = new Isoxys(NETWORK, TYPE);
 
-    this.kammask.setAccountByMnemonic(accOpts.mnemonic, accOpts.password, null, 0, accOpts.passphrase);
+    this.isoxys.setAccountByMnemonic(accOpts.mnemonic, accOpts.password, null, 0, accOpts.passphrase);
 
-    this.kammask.web3.eth.getCoinbase(function (er, re) {
+    this.isoxys.web3.eth.getCoinbase(function (er, re) {
       if (er) return self.setState({ ERROR: er.toString() });
       self.setState({ ADDRESS: re })
 
@@ -114,13 +114,13 @@ class TestKammask extends Component {
   confirmUser(callback) {
     var passphrase = window.prompt('Please enter passphrase:');
     if (!passphrase) return console.error('User denied signing transaction');
-    this.kammask.provider.unlockAccount(passphrase);
+    this.isoxys.provider.unlockAccount(passphrase);
     return callback();
   }
 
   getBalance(address) {
     var self = this;
-    this.kammask.web3.eth.getBalance(address, function (er, re) {
+    this.isoxys.web3.eth.getBalance(address, function (er, re) {
       if (er) return self.setState({ ERROR: er.toString() });
       return self.setState({ BALANCE: re.toString() });
     });
@@ -129,7 +129,7 @@ class TestKammask extends Component {
   sendTx() {
     var self = this;
     this.confirmUser(function () {
-      self.kammask.web3.eth.sendTransaction(
+      self.isoxys.web3.eth.sendTransaction(
         {
           from: self.state.ADDRESS,
           to: '0x0',
@@ -144,7 +144,7 @@ class TestKammask extends Component {
   render() {
     return (
       <div>
-        <h1>Kammask testing</h1>
+        <h1>Isoxys testing</h1>
         <p>View console log for details</p>
         <p>Account: {this.state.ADDRESS}</p>
         <p>Balance: {this.state.BALANCE} wei</p>
@@ -156,7 +156,7 @@ class TestKammask extends Component {
   }
 }
 
-export default TestKammask;
+export default TestIsoxys;
 ```
 
 ## Cheatsheet
