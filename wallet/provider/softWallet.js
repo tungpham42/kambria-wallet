@@ -114,18 +114,6 @@ class SoftWallet {
   }
 
   /**
-   * @func setPassphrase
-   * To unlock account, user must set temporarily passphrase to store.
-   * @param {*} passphrase 
-   */
-  setPassphrase(passphrase) {
-    var acc = this.store.get('ACCOUNT');
-    acc.PASSPHRASE = passphrase;
-    this.store.set('ACCOUNT', acc);
-    return true;
-  }
-
-  /**
    * @func constructPassword
    * Construct password from passphrase and salt
    * @param {*} passphrase 

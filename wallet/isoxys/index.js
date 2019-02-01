@@ -110,7 +110,7 @@ class Isoxys {
    */
   getAccountsByMnemonic(mnemonic, password, path, limit, page) {
     var list = [];
-    for (var i = page; i < page + limit; i++) {
+    for (var i = page * limit; i < page * limit + limit; i++) {
       var seed = Mnemonic.mnemonicToSeed(mnemonic, password)
       var hdk = Mnemonic.seedToHDKey(seed);
       var address = Mnemonic.hdkeyToAddress(hdk, path, i);
@@ -185,7 +185,7 @@ class Isoxys {
     var list = [];
     var coll = [];
 
-    for (var index = page; index < page + limit; index++) {
+    for (var index = page * limit; index < page * limit + limit; index++) {
       coll.push(index);
     }
 

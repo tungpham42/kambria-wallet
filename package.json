@@ -25,6 +25,7 @@
     "ethereumjs-util": "^6.0.0",
     "ethereumjs-wallet": "^0.6.2",
     "hdkey": "^1.1.0",
+    "react-modal": "^3.8.1",
     "web3": "^0.20.6",
     "web3-provider-engine": "^14.1.0"
   },
