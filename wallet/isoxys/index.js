@@ -52,6 +52,21 @@ class Isoxys {
     this.setWallet(account);
   }
 
+  /**
+   * @func getAccountByPrivatekey
+   * Get account by private key. (Do not recommend to use)
+   * @param {*} privatekey
+   * @param {*} callback 
+   */
+  getAccountByPrivatekey(privatekey, callback) {
+    console.warn(`ATTENTION:
+    This function is using private key in direct.
+    Eventhought it was secured by some cryptographical functions,
+    but we strongly recommend to avoid using it in the production environment.`);
+    var account = Privatekey.privatekeyToAccount(privatekey);
+    return callback(null, account.address);
+  }
+
 
   /**
    * MNEMONIC / HDKEY
@@ -108,7 +123,7 @@ class Isoxys {
    * @param {*} limit - the number of record per page
    * @param {*} page - index of page
    */
-  getAccountsByMnemonic(mnemonic, password, path, limit, page) {
+  getAccountsByMnemonic(mnemonic, password, path, limit, page, callback) {
     var list = [];
     for (var i = page * limit; i < page * limit + limit; i++) {
       var seed = Mnemonic.mnemonicToSeed(mnemonic, password)
@@ -116,7 +131,7 @@ class Isoxys {
       var address = Mnemonic.hdkeyToAddress(hdk, path, i);
       list.push(address);
     }
-    return list;
+    return callback(null, list);
   }
 
 
@@ -151,6 +166,34 @@ class Isoxys {
     }
     account.getPassphrase = getPassphrase;
     this.setWallet(account);
+  }
+
+  /**
+   * @func getAccountByKeystore
+   * Get account by keystore file
+   * @param {*} input - input object
+   * @param {*} password - password
+   * @param {*} v - version, ipnut 1 as v1, input 3 (default) as V3
+   * @param {*} callback 
+   */
+  getAccountByKeystore(input, password, v, callback) {
+    var isFromV1 = false;
+    switch (v) {
+      case 1:
+        isFromV1 = true;
+        break;
+      default:
+        isFromV1 = false;
+        break;
+    }
+
+    var account = null;
+    if (isFromV1) {
+      account = Keystore.fromV1(input, password);
+    } else {
+      account = Keystore.fromV3(input, password);
+    }
+    return callback(null, account.address);
   }
 
 

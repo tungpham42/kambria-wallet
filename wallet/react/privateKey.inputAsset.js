@@ -6,7 +6,7 @@ class PrivateKeyAsset extends Component {
 
     this.state = {
       visible: this.props.visible,
-      asset: null
+      privateKey: null
     }
 
     this.handleChange = this.handleChange.bind(this);
@@ -14,7 +14,7 @@ class PrivateKeyAsset extends Component {
   }
 
   handleChange(e) {
-    this.setState({ asset: e.target.value });
+    this.setState({ privateKey: e.target.value });
   }
 
   handleSubmit(e) {
@@ -25,7 +25,9 @@ class PrivateKeyAsset extends Component {
   returnData2Parent() {
     return this.props.done({
       subType: 'private-key',
-      asset: this.state.asset
+      asset: {
+        privateKey: this.state.privateKey
+      }
     });
   }
 
@@ -34,7 +36,7 @@ class PrivateKeyAsset extends Component {
     return (
       <div>
         <form onSubmit={this.handleSubmit}>
-          <label> PrivateKeyAsset
+          <label> Private Key
           <input type="text" value={this.state.value} onChange={this.handleChange} />
           </label>
           <input type="submit" value="Submit" />

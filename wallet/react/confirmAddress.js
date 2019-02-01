@@ -5,9 +5,10 @@ var Metamask = require('../metamask');
 var Isoxys = require('../isoxys');
 
 const ERROR = 'No address found';
-const DEFAULT_HD_PATH = "m/44'/60'/0'/0 ";
+const DEFAULT_HD_PATH = "m/44'/60'/0'/0";
+const DEFAULT_VERSION = 3;
 
-const getPassphrase = function (callback) {
+const GET_PASSPHRASE = function (callback) {
   var passphrase = window.prompt('Please enter passphrase:');
   if (!passphrase) return callback('User denied signing transaction', null);
   return callback(null, passphrase)
@@ -35,6 +36,7 @@ class ConfirmAddress extends Component {
     this.onSelect = this.onSelect.bind(this);
     this.onMore = this.onMore.bind(this);
     this.handle = this.handle.bind(this);
+    this.moreBtn = this.moreBtn.bind(this);
   }
 
   /**
@@ -65,18 +67,26 @@ class ConfirmAddress extends Component {
           this.props.data.asset.password,
           DEFAULT_HD_PATH,
           this.state.i,
-          getPassphrase
+          GET_PASSPHRASE
         );
         this.done(null, { provider: isoxys });
       }
       else if (this.props.data.subType === 'keystore') {
-
+        isoxys.setAccountByKeystore(
+          this.props.data.asset.keystore,
+          this.props.data.asset.password,
+          DEFAULT_VERSION,
+          GET_PASSPHRASE
+        )
       }
       else if (this.props.data.subType === 'ledger-nano-s') {
 
       }
       else if (this.props.data.subType === 'private-key') {
-
+        isoxys.setAccountByPrivatekey(
+          this.props.data.asset.privateKey,
+          GET_PASSPHRASE
+        )
       }
       else {
         return this.onClose(ERROR);
@@ -90,7 +100,7 @@ class ConfirmAddress extends Component {
   onSelect(e) {
     e.preventDefault();
     this.setState({
-      address: e.target.value,
+      selectedAddress: e.target.value,
       i: this.state.addressList.indexOf(e.target.value)
     });
   }
@@ -151,25 +161,45 @@ class ConfirmAddress extends Component {
 
   getAddressByIsoxys(data, limit, page) {
     var isoxys = new Isoxys(data.net, data.type);
-    if (data.subType === 'mnemonic') {
-      var re = isoxys.getAccountsByMnemonic(data.asset.mnemonic, data.asset.password, DEFAULT_HD_PATH, limit, page);
-      return new Promise((resolve, reject) => {
-        if (re.length <= 0) return reject(ERROR);
-        return resolve(re);
-      });
-    }
-    else if (data.subType === 'keystore') {
 
-    }
-    else if (data.subType === 'ledger-nano-s') {
+    return new Promise((resolve, reject) => {
+      if (data.subType === 'mnemonic') {
+        isoxys.getAccountsByMnemonic(
+          data.asset.mnemonic,
+          data.asset.password,
+          DEFAULT_HD_PATH,
+          limit,
+          page,
+          function (er, re) {
+            if (er || re.length <= 0) return reject(ERROR);
+            return resolve(re);
+          });
+      }
+      else if (data.subType === 'keystore') {
+        isoxys.getAccountByKeystore(
+          data.asset.keystore,
+          data.asset.password,
+          DEFAULT_VERSION,
+          function (er, re) {
+            if (er || !re) return reject(ERROR);
+            return resolve([re]);
+          });
+      }
+      else if (data.subType === 'ledger-nano-s') {
 
-    }
-    else if (data.subType === 'private-key') {
-
-    }
-    else {
-      return this.onClose(ERROR);
-    }
+      }
+      else if (data.subType === 'private-key') {
+        isoxys.getAccountByPrivatekey(
+          data.asset.privateKey,
+          function (er, re) {
+            if (er || !re) return reject(ERROR);
+            return resolve([re]);
+          });
+      }
+      else {
+        return reject(ERROR);
+      }
+    });
   }
 
   showAddresses(addressList) {
@@ -181,11 +211,16 @@ class ConfirmAddress extends Component {
     return (<select
       defaultChecked={addressList[0]}
       size={addressList.length}
-      value={this.state.address}
-      onChange={this.onSelect}
-    >
-      {re}
-    </select>);
+      value={this.state.selectedAddress}
+      onChange={this.onSelect} >
+      {re} </select>);
+  }
+
+  moreBtn() {
+    var btn = <button onClick={this.onMore}>More</button>
+    if (this.props.data.subType === 'mnemonic') return btn;
+    if (this.props.data.subType === 'ledger-nano-s') return btn;
+    return null;
   }
 
   render() {
@@ -200,7 +235,7 @@ class ConfirmAddress extends Component {
         <div>
           <p>Confirm address:</p>
           {this.showAddresses(this.state.addressList)}
-          <button onClick={this.onMore}>More</button>
+          {this.moreBtn()}
         </div>
         <button onClick={this.onConfirm}>Confirm</button>
       </Modal>

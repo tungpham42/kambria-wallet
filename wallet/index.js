@@ -130,7 +130,6 @@ class Wallet extends Component {
   }
 
   doneConfirmAddress(er, re) {
-    console.log(er, re)
     if (er || !re) return this.setState({ step: 'StopRegister' });
 
     this.setState({ provider: re.provider });

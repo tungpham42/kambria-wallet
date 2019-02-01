@@ -21,7 +21,7 @@ Keystore.fromV3 = function (input, password) {
     address: util.padHex(wallet.getAddress()),
     privateKey: wallet.getPrivateKey().toString('hex')
   }
-  
+
   return account;
 }
 
