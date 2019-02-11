@@ -11,7 +11,7 @@ class HardWallet {
    * @param {*} accOpts - accOpts = {
    *   signTransaction: (function) ...
    *   getAddress: (function) ...
-   *   dpath: (optional) ...
+   *   path: (string) ...
    *   index: (optional) ...
    * }
    */
@@ -21,7 +21,7 @@ class HardWallet {
     var engine = new Engine(this.network, this.opts());
     this.store = new Store();
     this.hardware = null;
-    this.dpath = util.addDPath(accOpts.dpath, accOpts.index);
+    this.dpath = util.addDPath(accOpts.path, accOpts.index);
     var ok = this.setAccount(accOpts.getAddress, accOpts.signTransaction);
     if (!ok) throw new Error(error.CANNOT_SET_ACCOUNT);
     this.web3 = engine.web3;

@@ -5,6 +5,14 @@ import ConfirmAddress from './react/confirmAddress';
 import Modal from 'react-modal';
 
 const ERROR = 'User denied to register';
+const DEFAULT_STATE = {
+  step: null,
+  wallet: null,
+  type: null,
+  subType: null,
+  provider: null,
+  asset: null
+}
 
 /**
  * For modals
@@ -45,22 +53,8 @@ class Wallet extends Component {
 
   componentDidUpdate(prevProps) {
     if (this.props.visible !== prevProps.visible) {
-      if (this.props.visible) {
-        this.setState({
-          step: 'SellectWallet',
-          wallet: null,
-          type: null,
-          provider: null
-        });
-      }
-      else {
-        this.setState({
-          step: null,
-          wallet: null,
-          type: null,
-          provider: null
-        });
-      }
+      if (this.props.visible) this.setState({ step: 'SellectWallet' });
+      else this.setState(DEFAULT_STATE);
     }
   }
 
@@ -130,9 +124,9 @@ class Wallet extends Component {
   }
 
   doneConfirmAddress(er, re) {
-    if (er || !re) return this.setState({ step: 'StopRegister' });
-
-    this.setState({ provider: re.provider });
+    if (er || !re) this.done(ERROR, null);
+    else this.done(null, re.provider);
+    return this.setState(DEFAULT_STATE);
   }
 
   render() {

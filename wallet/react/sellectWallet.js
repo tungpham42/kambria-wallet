@@ -43,8 +43,9 @@ class SellectWallet extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this.props.visible !== prevProps.visible)
+    if (this.props.visible !== prevProps.visible) {
       this.setState({ visible: this.props.visible });
+    }
   }
 
   render() {

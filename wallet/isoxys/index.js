@@ -77,7 +77,7 @@ class Isoxys {
    * Set account by mnemonic (bip39) following hdkey (bip44)
    * @param {*} mnemonic - 12 words
    * @param {*} password - (optional) password
-   * @param {*} path - derivation path
+   * @param {*} path - root derivation path
    * References:
    * m/44'/60'/0'/0: (Default) Jaxx, Metamask, Exodus, imToken, TREZOR (ETH) & BitBox
    * m/44'/60'/0': Ledger (ETH)
@@ -103,13 +103,13 @@ class Isoxys {
    * m/44'/76'/0'/0: Network: Mix Blockchain (MIX)
    * m/44'/1171337'/0'/0: Network: Iolite (ILT)
    * 
-   * @param {*} i - index of account
+   * @param {*} index - index of account
    * @param {function} getPassphrase - simulate the account locking/unlocking
    */
-  setAccountByMnemonic(mnemonic, password, path, i, getPassphrase) {
+  setAccountByMnemonic(mnemonic, password, path, index, getPassphrase) {
     var seed = Mnemonic.mnemonicToSeed(mnemonic, password)
     var hdk = Mnemonic.seedToHDKey(seed);
-    var account = Mnemonic.hdkeyToAccount(hdk, path, i);
+    var account = Mnemonic.hdkeyToAccount(hdk, path, index);
     account.getPassphrase = getPassphrase;
     this.setWallet(account);
   }
@@ -119,7 +119,7 @@ class Isoxys {
    * Get list of accounts by mnemonic
    * @param {*} mnemonic - 12 words 
    * @param {*} password - (optional) password
-   * @param {*} path - derivation path (m/44'/60'/0'/0 as default)
+   * @param {*} path - root derivation path (m/44'/60'/0'/0 as default)
    * @param {*} limit - the number of record per page
    * @param {*} page - index of page
    */
@@ -144,26 +144,10 @@ class Isoxys {
    * Set account by keystore file
    * @param {*} input - input object
    * @param {*} password - password
-   * @param {*} v - version, ipnut 1 as v1, input 3 (default) as V3
    * @param {function} getPassphrase - simulate the account locking/unlocking 
    */
-  setAccountByKeystore(input, password, v, getPassphrase) {
-    var isFromV1 = false;
-    switch (v) {
-      case 1:
-        isFromV1 = true;
-        break;
-      default:
-        isFromV1 = false;
-        break;
-    }
-
-    var account = null;
-    if (isFromV1) {
-      account = Keystore.fromV1(input, password);
-    } else {
-      account = Keystore.fromV3(input, password);
-    }
+  setAccountByKeystore(input, password, getPassphrase) {
+    var account = Keystore.recover(input, password);
     account.getPassphrase = getPassphrase;
     this.setWallet(account);
   }
@@ -173,26 +157,10 @@ class Isoxys {
    * Get account by keystore file
    * @param {*} input - input object
    * @param {*} password - password
-   * @param {*} v - version, ipnut 1 as v1, input 3 (default) as V3
    * @param {*} callback 
    */
-  getAccountByKeystore(input, password, v, callback) {
-    var isFromV1 = false;
-    switch (v) {
-      case 1:
-        isFromV1 = true;
-        break;
-      default:
-        isFromV1 = false;
-        break;
-    }
-
-    var account = null;
-    if (isFromV1) {
-      account = Keystore.fromV1(input, password);
-    } else {
-      account = Keystore.fromV3(input, password);
-    }
+  getAccountByKeystore(input, password, callback) {
+    var account = Keystore.recover(input, password);
     return callback(null, account.address);
   }
 
@@ -204,14 +172,14 @@ class Isoxys {
   /**
    * @func setAccountByLedger
    * Set account by ledger
-   * @param {*} dpath - (optional)
+   * @param {*} path - root derivation path (m/44'/60'/0' as default)
    * @param {*} index - (optional)
    */
-  setAccountByLedger(dpath, index) {
+  setAccountByLedger(path, index) {
     var account = {
       getAddress: Ledger.getAddress,
       signTransaction: Ledger.signTransaction,
-      dpath: dpath,
+      path: path,
       index: index
     }
     this.setWallet(account);
@@ -220,11 +188,11 @@ class Isoxys {
   /**
    * @func getAccountsByLedger
    * Get list of accounts by ledger
-   * @param {*} dpath 
+   * @param {*} path - root derivation path (m/44'/60'/0' as default)
    * @param {*} limit 
    * @param {*} page 
    */
-  getAccountsByLedger(dpath, limit, page, callback) {
+  getAccountsByLedger(path, limit, page, callback) {
     var list = [];
     var coll = [];
 
@@ -232,22 +200,20 @@ class Isoxys {
       coll.push(index);
     }
 
-    var done = function (er) {
-      if (er) return callback(er, null);
-      return callback(null, list);
-    }
-
-    if (!dpath) {
+    if (!path) {
       return callback(null, []);
     } else if (coll.length > 0) {
       async.eachSeries(coll, function (i, cb) {
-        dpath = util.addDPath(dpath, i);
+        var dpath = util.addDPath(path, i);
         Ledger.getAddress(dpath, function (er, addr) {
           if (er) return cb(er);
           if (addr) list.push(addr);
           return cb();
         });
-      }, done);
+      }, function (er) {
+        if (er) return callback(er, null);
+        return callback(null, list);
+      });
     }
     else {
       return callback(null, []);

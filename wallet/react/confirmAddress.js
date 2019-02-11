@@ -6,7 +6,7 @@ var Isoxys = require('../isoxys');
 
 const ERROR = 'No address found';
 const DEFAULT_HD_PATH = "m/44'/60'/0'/0";
-const DEFAULT_VERSION = 3;
+const LIMIT = 5, PAGE = 0;
 
 const GET_PASSPHRASE = function (callback) {
   var passphrase = window.prompt('Please enter passphrase:');
@@ -24,8 +24,8 @@ class ConfirmAddress extends Component {
       addressList: [],
       selectedAddress: null,
       i: 0,
-      limit: 10,
-      page: 0
+      limit: LIMIT,
+      page: PAGE
     }
 
     this.done = this.props.done;
@@ -35,7 +35,7 @@ class ConfirmAddress extends Component {
     this.onConfirm = this.onConfirm.bind(this);
     this.onSelect = this.onSelect.bind(this);
     this.onMore = this.onMore.bind(this);
-    this.handle = this.handle.bind(this);
+    this.getAddress = this.getAddress.bind(this);
     this.moreBtn = this.moreBtn.bind(this);
   }
 
@@ -55,43 +55,18 @@ class ConfirmAddress extends Component {
 
   onConfirm() {
     this.setState({ visible: false });
-    if (this.props.data.wallet === 'metamask') {
-      var metamask = new Metamask();
-      this.done(null, { provider: metamask });
-    }
-    else if (this.props.data.wallet === 'isoxys') {
-      var isoxys = new Isoxys(this.props.data.net, this.props.data.type);
-      if (this.props.data.subType === 'mnemonic') {
-        isoxys.setAccountByMnemonic(
-          this.props.data.asset.mnemonic,
-          this.props.data.asset.password,
-          DEFAULT_HD_PATH,
-          this.state.i,
-          GET_PASSPHRASE
-        );
-        this.done(null, { provider: isoxys });
-      }
-      else if (this.props.data.subType === 'keystore') {
-        isoxys.setAccountByKeystore(
-          this.props.data.asset.keystore,
-          this.props.data.asset.password,
-          DEFAULT_VERSION,
-          GET_PASSPHRASE
-        )
-      }
-      else if (this.props.data.subType === 'ledger-nano-s') {
 
-      }
-      else if (this.props.data.subType === 'private-key') {
-        isoxys.setAccountByPrivatekey(
-          this.props.data.asset.privateKey,
-          GET_PASSPHRASE
-        )
-      }
-      else {
-        return this.onClose(ERROR);
-      }
+    // Confirm Metmask address
+    if (this.props.data.wallet === 'metamask') {
+      var metamask = this.setAddressByMetamask();
+      return this.done(null, { provider: metamask });
     }
+    // Confirm Isoxys address
+    else if (this.props.data.wallet === 'isoxys') {
+      var isoxys = this.setAddressByIsoxys(this.props.data, this.state.i);
+      return this.done(null, { provider: isoxys });
+    }
+    // Error occurs
     else {
       return this.onClose(ERROR);
     }
@@ -106,8 +81,8 @@ class ConfirmAddress extends Component {
   }
 
   onMore() {
-    this.getAddressByIsoxys(this.props.data, this.state.limit, this.state.page + 1).then(re => {
-      var page = this.state.page + 1;
+    var page = this.state.page + 1;
+    this.getAddressByIsoxys(this.props.data, this.state.limit, page).then(re => {
       var addressList = this.state.addressList;
       addressList.push(...re);
       this.setState({ page: page, addressList: addressList });
@@ -118,7 +93,7 @@ class ConfirmAddress extends Component {
 
   componentDidUpdate(prevProps) {
     if (this.props.visible !== prevProps.visible) {
-      this.handle(this.props.data);
+      if (this.props.visible) this.getAddress(this.props.data);
       this.setState({ visible: this.props.visible });
     }
   }
@@ -127,18 +102,17 @@ class ConfirmAddress extends Component {
   /**
    * Data controllers
    */
-
-  handle(data) {
+  getAddress(data) {
     if (data.wallet === 'metamask') {
-      this.getAccountByMetamask().then(re => {
-        this.setState({ addressList: re });
+      this.getAddressByMetamask().then(re => {
+        return this.setState({ addressList: re });
       }).catch(er => {
         if (er) return this.onClose(ERROR);
       });
     }
     else if (data.wallet === 'isoxys') {
       this.getAddressByIsoxys(data, this.state.limit, this.state.page).then(re => {
-        this.setState({ addressList: re });
+        return this.setState({ addressList: re });
       }).catch(er => {
         if (er) return this.onClose(ERROR);
       });
@@ -148,7 +122,10 @@ class ConfirmAddress extends Component {
     }
   }
 
-  getAccountByMetamask() {
+  /**
+   * Wallet conventions
+   */
+  getAddressByMetamask() {
     var metamask = new Metamask();
     return new Promise((resolve, reject) => {
       metamask.getAccount().then(re => {
@@ -159,49 +136,105 @@ class ConfirmAddress extends Component {
     });
   }
 
+  setAddressByMetamask() {
+    var metamask = new Metamask();
+    return metamask;
+  }
+
   getAddressByIsoxys(data, limit, page) {
     var isoxys = new Isoxys(data.net, data.type);
 
     return new Promise((resolve, reject) => {
-      if (data.subType === 'mnemonic') {
-        isoxys.getAccountsByMnemonic(
-          data.asset.mnemonic,
-          data.asset.password,
-          DEFAULT_HD_PATH,
-          limit,
-          page,
-          function (er, re) {
-            if (er || re.length <= 0) return reject(ERROR);
-            return resolve(re);
-          });
-      }
-      else if (data.subType === 'keystore') {
-        isoxys.getAccountByKeystore(
-          data.asset.keystore,
-          data.asset.password,
-          DEFAULT_VERSION,
-          function (er, re) {
-            if (er || !re) return reject(ERROR);
-            return resolve([re]);
-          });
-      }
-      else if (data.subType === 'ledger-nano-s') {
-
-      }
-      else if (data.subType === 'private-key') {
-        isoxys.getAccountByPrivatekey(
-          data.asset.privateKey,
-          function (er, re) {
-            if (er || !re) return reject(ERROR);
-            return resolve([re]);
-          });
-      }
-      else {
-        return reject(ERROR);
+      switch (data.subType) {
+        // Mnemonic
+        case 'mnemonic':
+          return isoxys.getAccountsByMnemonic(
+            data.asset.mnemonic,
+            data.asset.password,
+            DEFAULT_HD_PATH,
+            limit,
+            page,
+            function (er, re) {
+              if (er || re.length <= 0) return reject(ERROR);
+              return resolve(re);
+            });
+        // Keystore
+        case 'keystore':
+          return isoxys.getAccountByKeystore(
+            data.asset.keystore,
+            data.asset.password,
+            function (er, re) {
+              if (er || !re) return reject(ERROR);
+              return resolve([re]);
+            });
+        // Ledger Nano S
+        case 'ledger-nano-s':
+          return isoxys.getAccountsByLedger(
+            DEFAULT_HD_PATH,
+            limit,
+            page,
+            function (er, re) {
+              if (er || re.length <= 0) return reject(ERROR);
+              return resolve(re);
+            });
+        // Private key
+        case 'private-key':
+          return isoxys.getAccountByPrivatekey(
+            data.asset.privateKey,
+            function (er, re) {
+              if (er || !re) return reject(ERROR);
+              return resolve([re]);
+            });
+        // Error
+        default:
+          return reject(ERROR);
       }
     });
   }
 
+  setAddressByIsoxys(data, i) {
+    var isoxys = new Isoxys(data.net, data.type);
+
+    switch (data.subType) {
+      // Mnemonic
+      case 'mnemonic':
+        isoxys.setAccountByMnemonic(
+          data.asset.mnemonic,
+          data.asset.password,
+          DEFAULT_HD_PATH,
+          i,
+          GET_PASSPHRASE
+        );
+        return isoxys;
+      // Keystore
+      case 'keystore':
+        isoxys.setAccountByKeystore(
+          data.asset.keystore,
+          data.asset.password,
+          GET_PASSPHRASE
+        );
+        return isoxys;
+      // Ledger Nano S
+      case 'ledger-nano-s':
+        isoxys.setAccountByLedger(
+          DEFAULT_HD_PATH,
+          i
+        );
+        return isoxys;
+      // Private key
+      case 'private-key':
+        isoxys.setAccountByPrivatekey(
+          data.asset.privateKey,
+          GET_PASSPHRASE
+        );
+        return isoxys;
+      // Error
+      default:
+        return null;
+    }
+  }
+
+  // UI conventions
   showAddresses(addressList) {
     var re = [];
     for (var i = 0; i < addressList.length; i++) {
