@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import SellectWallet from './react/sellectWallet';
 import InputAsset from './react/inputAsset';
 import ConfirmAddress from './react/confirmAddress';
-import Modal from 'react-modal';
+import InputPassphrase from './react/inputPassphrase';
 
 const ERROR = 'User denied to register';
 const DEFAULT_STATE = {
@@ -11,24 +11,9 @@ const DEFAULT_STATE = {
   type: null,
   subType: null,
   provider: null,
-  asset: null
+  asset: null,
+  passphrase: false
 }
-
-/**
- * For modals
- */
-Modal.setAppElement('#root');
-const customStyles = {
-  content: {
-    top: '50%',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)'
-  }
-}
-
 
 
 class Wallet extends Component {
@@ -42,13 +27,21 @@ class Wallet extends Component {
       wallet: null, // null, metamask, isoxys
       type: null, // softwallet, hardwallet
       subType: null, // null, mnemonic, keystore, ledger-nano-s, private-key
-      provider: null
+      provider: null,
+      passphrase: false
     }
 
     this.done = this.props.done;
     this.doneSellectWallet = this.doneSellectWallet.bind(this);
     this.doneInputAsset = this.doneInputAsset.bind(this);
     this.doneConfirmAddress = this.doneConfirmAddress.bind(this);
+
+    var self = this;
+    window.GET_PASSPHRASE = function (callback) {
+      self.setState({
+        passphrase: <InputPassphrase visible={true} done={callback} />
+      });
+    }
   }
 
   componentDidUpdate(prevProps) {
@@ -124,6 +117,7 @@ class Wallet extends Component {
   }
 
   doneConfirmAddress(er, re) {
+    console.log(er, re)
     if (er || !re) this.done(ERROR, null);
     else this.done(null, re.provider);
     return this.setState(DEFAULT_STATE);
@@ -133,9 +127,10 @@ class Wallet extends Component {
     console.log('DEBUG:', this.state)
     return (
       <div>
-        <SellectWallet visible={this.state.step === 'SellectWallet'} data={this.state} done={this.doneSellectWallet} style={customStyles} />
-        <InputAsset visible={this.state.step === 'InputAsset'} data={this.state} done={this.doneInputAsset} style={customStyles} />
-        <ConfirmAddress visible={this.state.step === 'ConfirmAddress'} data={this.state} done={this.doneConfirmAddress} style={customStyles} />
+        <SellectWallet visible={this.state.step === 'SellectWallet' && !this.state.passphrase} data={this.state} done={this.doneSellectWallet} />
+        <InputAsset visible={this.state.step === 'InputAsset' && !this.state.passphrase} data={this.state} done={this.doneInputAsset} />
+        <ConfirmAddress visible={this.state.step === 'ConfirmAddress' && !this.state.passphrase} data={this.state} done={this.doneConfirmAddress} />
+        {this.state.passphrase}
       </div>
     )
   }

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import Modal from 'react-modal';
+import Modal from 'react-bootstrap4-modal';
+import { Button } from './core/buttons';
 
 var Metamask = require('../metamask');
 var Isoxys = require('../isoxys');
@@ -72,11 +73,10 @@ class ConfirmAddress extends Component {
     }
   }
 
-  onSelect(e) {
-    e.preventDefault();
+  onSelect(index, address) {
     this.setState({
-      selectedAddress: e.target.value,
-      i: this.state.addressList.indexOf(e.target.value)
+      selectedAddress: address,
+      i: index
     });
   }
 
@@ -237,20 +237,20 @@ class ConfirmAddress extends Component {
   // UI conventions
   showAddresses(addressList) {
     var re = [];
-    for (var i = 0; i < addressList.length; i++) {
-      var item = (<option key={i} value={addressList[i]}>{addressList[i]}</option>);
+    for (let i = 0; i < addressList.length; i++) {
+      var item = (
+        <label key={i} className="radio-wrapper">{addressList[i]}
+          <input type="radio" name="address" onChange={() => this.onSelect(i, addressList[i])} value={addressList[i]} />
+          <span className="checkmark"></span>
+        </label>
+      );
       re.push(item);
     }
-    return (<select
-      defaultChecked={addressList[0]}
-      size={addressList.length}
-      value={this.state.selectedAddress}
-      onChange={this.onSelect} >
-      {re} </select>);
+    return re;
   }
 
   moreBtn() {
-    var btn = <button onClick={this.onMore}>More</button>
+    var btn = <Button type="primary-gray" size="sm" onClick={this.onMore} >Load More</Button>
     if (this.props.data.subType === 'mnemonic') return btn;
     if (this.props.data.subType === 'ledger-nano-s') return btn;
     return null;
@@ -258,19 +258,29 @@ class ConfirmAddress extends Component {
 
   render() {
     return (
-      <Modal
-        isOpen={this.state.visible}
-        onRequestClose={this.onClickBackdrop}
-        style={this.props.style}
-      >
-        <h2>ConfirmAddress</h2>
-        <button onClick={this.onClose}>x</button>
-        <div>
-          <p>Confirm address:</p>
-          {this.showAddresses(this.state.addressList)}
-          {this.moreBtn()}
+      <Modal className="wallet-modal choose-wallet-address"
+        visible={this.state.visible}
+        onClickBackdrop={this.onClickBackdrop}
+        dialogClassName="modal-dialog-centered">
+
+        <div className="modal-body">
+          <button type="button" className="close-button" onClick={this.onClose} />
+          <span className="title d-block text-center mt-4" style={{ "color": "#13CDAC", "fontSize": "24px" }}>Choose Your Wallet Address</span>
+          <p className="d-block text-center mb-4" style={{ "color": "#282F38", "fontSize": "16px", "lineHeight": "18px" }}>Choose a wallet to access fully functional features</p>
+
+          <div className="addresses">
+            {this.showAddresses(this.state.addressList)}
+            {this.moreBtn()}
+          </div>
+
+          <Button
+            type="primary"
+            size="sm"
+            customStyle={{ "display": "block", "margin": "8px auto 0" }}
+            onClick={this.onConfirm}
+          >Confirm</Button>
         </div>
-        <button onClick={this.onConfirm}>Confirm</button>
+
       </Modal>
     );
   }

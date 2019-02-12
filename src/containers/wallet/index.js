@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import Wallet from '@kambria/kambria-wallet';
 
+import '@kambria/kambria-wallet/dist/skin/styles/index.css';
+
 
 class TestWallet extends Component {
   constructor() {

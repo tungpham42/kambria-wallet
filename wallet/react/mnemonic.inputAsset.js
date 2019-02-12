@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { Button } from './core/buttons';
+
 
 class MnemonicAsset extends Component {
   constructor(props) {
@@ -49,14 +51,25 @@ class MnemonicAsset extends Component {
     if (!this.props.visible) return null;
     return (
       <div>
-        <form onSubmit={this.handleSubmit}>
-          <label> Mnemonic
-          <input type="text" value={this.state.mnemonic} onChange={this.handleChangeMnemonic} />
-          </label>
-          <label> Password (optional)
-          <input type="text" value={this.state.password} onChange={this.handleChangePassword} />
-          </label>
-          <input type="submit" value="Submit" />
+        <form>
+          <h3>Seed</h3>
+          <p className='type recommended'>This is a recommended way to access your wallet.</p>
+          <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>
+
+          <div>
+            <span className="label mt-3 d-block">Enter seed</span>
+            <input type="text" value={this.state.mnemonic} onChange={this.handleChangeMnemonic} />
+
+            <span className="label mt-3 d-block">Enter password (Optional)</span>
+            <input type="password" value={this.state.password} onChange={this.handleChangePassword} />
+          </div>
+
+          <Button
+            type="primary"
+            size="sm"
+            customStyle={{ "float": "right", "marginTop": "24px", "width": "170px" }}
+            onClick={this.handleSubmit}
+          >OK</Button>
         </form>
       </div>
     )
