@@ -5,6 +5,8 @@ import ConfirmAddress from './skin/react/confirmAddress';
 import InputPassphrase from './skin/react/inputPassphrase';
 import ErrorModal from './skin/react/core/error';
 
+import './skin/static/styles/index.css';
+
 const DEFAULT_STATE = {
   step: null,
   wallet: null, // null, metamask, isoxys
