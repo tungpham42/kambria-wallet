@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import Modal from 'react-bootstrap4-modal';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { Button } from './core/buttons';
 
-var Metamask = require('../metamask');
-var Isoxys = require('../isoxys');
+var Metamask = require('../../lib/metamask');
+var Isoxys = require('../../lib/isoxys');
 
 const ERROR = 'No address found';
 const DEFAULT_HD_PATH = "m/44'/60'/0'/0";
@@ -14,7 +16,8 @@ const DEFAULT_STATE = {
   selectedAddress: null,
   i: 0,
   limit: LIMIT,
-  page: PAGE
+  page: PAGE,
+  loading: false
 }
 
 
@@ -81,13 +84,17 @@ class ConfirmAddress extends Component {
   }
 
   onMore() {
-    var page = this.state.page + 1;
-    this.getAddressByIsoxys(this.props.data, this.state.limit, page).then(re => {
-      var addressList = this.state.addressList;
-      addressList.push(...re);
-      this.setState({ page: page, addressList: addressList });
-    }).catch(er => {
-      if (er) return this.onClose(ERROR);
+    this.setState({ loading: true }, function () {
+      var page = this.state.page + 1;
+      this.getAddressByIsoxys(this.props.data, this.state.limit, page).then(re => {
+        var addressList = this.state.addressList;
+        addressList.push(...re);
+        this.setState({ page: page, addressList: addressList });
+      }).catch(er => {
+        if (er) this.onClose(ERROR);
+      }).finally(() => {
+        return this.setState({ loading: false });
+      });
     });
   }
 
@@ -274,10 +281,22 @@ class ConfirmAddress extends Component {
           <span className="title d-block text-center mt-4" style={{ "color": "#13CDAC", "fontSize": "24px" }}>Choose Your Wallet Address</span>
           <p className="d-block text-center mb-4" style={{ "color": "#282F38", "fontSize": "16px", "lineHeight": "18px" }}>Choose a wallet to access fully functional features</p>
 
-          <div className="addresses">
-            {this.showAddresses(this.state.i, this.state.addressList)}
-            {this.moreBtn()}
-          </div>
+          {
+            (!this.state.addressList || this.state.addressList.length <= 0 || this.state.loading) ?
+              <div className="d-block text-center mb-4">
+                <FontAwesomeIcon icon={faSpinner} spin /> Loading address...
+              </div>
+              : null
+          }
+
+          {
+            (!this.state.addressList || this.state.addressList.length <= 0) ?
+              null :
+              <div className="addresses">
+                {this.showAddresses(this.state.i, this.state.addressList)}
+                {this.moreBtn()}
+              </div>
+          }
 
           <Button
             type="primary"

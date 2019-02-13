@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
-import SellectWallet from './react/sellectWallet';
-import InputAsset from './react/inputAsset';
-import ConfirmAddress from './react/confirmAddress';
-import InputPassphrase from './react/inputPassphrase';
-import ErrorModal from './react/core/error';
+import SellectWallet from './skin/react/sellectWallet';
+import InputAsset from './skin/react/inputAsset';
+import ConfirmAddress from './skin/react/confirmAddress';
+import InputPassphrase from './skin/react/inputPassphrase';
+import ErrorModal from './skin/react/core/error';
 
-const ERROR = 'User denied to register';
 const DEFAULT_STATE = {
   step: null,
   wallet: null, // null, metamask, isoxys
@@ -131,14 +130,13 @@ class Wallet extends Component {
   }
 
   render() {
-    console.log('DEBUG:', this.state)
     return (
       <div>
         <SellectWallet visible={this.state.step === 'SellectWallet' && !this.state.passphrase} data={this.state} done={this.doneSellectWallet} />
         <InputAsset visible={this.state.step === 'InputAsset' && !this.state.passphrase} data={this.state} done={this.doneInputAsset} />
         <ConfirmAddress visible={this.state.step === 'ConfirmAddress' && !this.state.passphrase} data={this.state} done={this.doneConfirmAddress} />
         <InputPassphrase visible={this.state.passphrase} done={(er, re) => { this.state.callback(er, re) }} />
-        <ErrorModal visible={this.state.step === 'Error'} error={this.state.error} done={(er) => { console.log(er) }} />
+        <ErrorModal visible={this.state.step === 'Error'} error={this.state.error} done={() => { this.done(this.state.error, null) }} />
       </div>
     )
   }

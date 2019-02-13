@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Wallet from '@kambria/kambria-wallet';
 
-import '@kambria/kambria-wallet/dist/skin/styles/index.css';
+import '@kambria/kambria-wallet/dist/skin/static/styles/index.css';
 
 
 class TestWallet extends Component {
@@ -59,7 +59,7 @@ class TestWallet extends Component {
       to: '0x5a926b235e992d6ba52d98415e66afe5078a1690',
       value: '1000000000000000'
     }, function (er, txId) {
-      console.log(er,txId)
+      console.log(er, txId)
       if (er) return self.setState({ ERROR: JSON.stringify(er) });
       return self.setState({ TXID: txId.toString() });
     });
@@ -86,6 +86,7 @@ class TestWallet extends Component {
         <button onClick={() => this.visible(true)}>Visible</button>
         <button onClick={() => this.close()}>Close</button>
         {this.showInfo()}
+        {this.state.error ? <p>{this.state.error}</p> : null}
 
         <Wallet visible={this.state.visible} net={4} done={this.done} />
       </div>

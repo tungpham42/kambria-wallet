@@ -1,8 +1,8 @@
 /**
  * Client JS library
  */
-import Metamask from './dist/metamask';
-import Isoxys from './dist/isoxys';
+import Metamask from './dist/lib/metamask';
+import Isoxys from './dist/lib/isoxys';
 import Wallet from './dist';
 
 export { Metamask, Isoxys };

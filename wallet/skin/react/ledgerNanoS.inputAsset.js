@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Button } from './core/buttons';
-var Isoxys = require('../isoxys');
+var Isoxys = require('../../lib/isoxys');
 
 var COUNTER = 0;
 var TIMEOUT = 60;

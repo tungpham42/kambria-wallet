@@ -10,8 +10,6 @@ class PrivateKeyAsset extends Component {
   constructor(props) {
     super(props);
 
-    console.log('=======')
-
     this.state = {
       ...DEFAULT_STATE
     }

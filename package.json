@@ -5,19 +5,22 @@
   "main": "index.js",
   "scripts": {
     "release": "npm run build && npm publish",
-    "start": "HTTPS=true REACT_APP_ENV=development react-scripts start",
-    "build": "npm run clean && babel wallet -d dist && babel exports.js -o index.js && npm run css && cp -R ./wallet/skin ./dist/skin",
+    "start": "",
+    "build": "npm run clean && npm run build-js && npm run build-css",
     "clean": "rm -rf dist && rm -rf index.js",
-    "test": "npm run pre-test && npm start",
+    "test": "npm run pre-test && HTTPS=true REACT_APP_ENV=development react-scripts start",
     "pre-test": "npm run build && npm run fake-module",
     "fake-module": "rm -rf ./node_modules/@kambria && mkdir -p ./node_modules/@kambria/kambria-wallet && cp -R ./dist ./node_modules/@kambria/kambria-wallet/dist && cp ./index.js ./node_modules/@kambria/kambria-wallet/index.js",
-    "css": "sass ./wallet/skin/styles/index.scss ./wallet/skin/styles/index.css --style compressed"
+    "build-js": "babel wallet -d dist && babel exports.js -o index.js",
+    "build-css": "npm run scss && cp -R ./wallet/skin/static ./dist/skin/static",
+    "scss": "sass ./wallet/skin/static/styles/index.scss ./wallet/skin/static/styles/index.css --style compressed"
   },
   "author": "tphanson <tphanson@kambria.io>",
   "license": "ISC",
   "dependencies": {
     "@babel/polyfill": "^7.0.0",
-    "@fortawesome/fontawesome-svg-core": "^1.2.14",
+    "@fortawesome/fontawesome-svg-core": "^1.2.15",
+    "@fortawesome/free-solid-svg-icons": "^5.7.2",
     "@fortawesome/react-fontawesome": "0.1.0-11",
     "@ledgerhq/hw-app-eth": "^4.32.0",
     "@ledgerhq/hw-transport-u2f": "^4.32.0",
