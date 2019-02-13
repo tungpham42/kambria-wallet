@@ -17,20 +17,13 @@ class SellectWallet extends Component {
     this.done = this.props.done;
 
     this.onClose = this.onClose.bind(this);
-    this.onClickBackdrop = this.onClickBackdrop.bind(this);
     this.onMetamask = this.onMetamask.bind(this);
     this.onIsoxys = this.onIsoxys.bind(this);
   }
 
   onClose(er) {
-    er = er ? er : ERROR;
     this.setState({ visible: false });
     this.done(er, null);
-  }
-
-  onClickBackdrop() {
-    this.setState({ visible: false });
-    this.done(ERROR, null);
   }
 
   onMetamask() {
@@ -53,11 +46,11 @@ class SellectWallet extends Component {
     return (
       <Modal className="wallet-modal choose-wallet"
         visible={this.state.visible}
-        onClickBackdrop={this.onClickBackdrop}
+        onClickBackdrop={() => this.onClose()}
         dialogClassName="modal-dialog-centered">
 
         <div className="modal-body">
-          <button type="button" className="close-button" onClick={this.onClose} />
+          <button type="button" className="close-button" onClick={() => this.onClose()} />
           <span className="title d-block text-center mt-4" style={{ "color": "#13CDAC", "fontSize": "24px" }}>Choose Your Wallet</span>
           <p className="d-block text-center mb-4" style={{ "color": "#282F38", "fontSize": "16px", "lineHeight": "18px" }}>Choose a wallet to access fully functional features</p>
           <div className="wallets">
@@ -82,7 +75,7 @@ class SellectWallet extends Component {
             type="gray"
             size="sm"
             customStyle={{ "display": "block", "margin": "8px auto 0" }}
-            onClick={this.onClose}>Skip To Website</Button>
+            onClick={() => this.onClose()}>Skip To Website</Button>
         </div>
 
       </Modal>

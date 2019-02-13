@@ -17,18 +17,9 @@ class SoftWallet {
    *   getPassphrase: ...
    * }
    */
-  constructor(net, accOpts) {
-    var self = this;
-
-    accOpts = accOpts || {};
+  constructor(net) {
     this.network = util.chainCode(net);
-    var engine = new Engine(this.network, this.opts());
     this.store = new Store();
-    this.getPassphrase = accOpts.getPassphrase;
-    this.setAccount(accOpts.address, accOpts.privateKey, accOpts.getPassphrase, function (er, re) {
-      if (er) throw new Error(error.CANNOT_SET_ACCOUNT);
-      self.web3 = engine.web3;
-    });
   }
 
   /**
@@ -61,8 +52,26 @@ class SoftWallet {
   }
 
   /**
+   * @func init
+   * Initialize web3 
+   * @param {*} accOpts 
+   * @param {*} callback 
+   */
+  init(accOpts, callback) {
+    var self = this;
+    accOpts = accOpts || {};
+    this.getPassphrase = accOpts.getPassphrase;
+    var engine = new Engine(this.network, this.opts());
+    this.setAccount(accOpts.address, accOpts.privateKey, accOpts.getPassphrase, function (er, re) {
+      if (er) throw new Error(error.CANNOT_SET_ACCOUNT);
+      self.web3 = engine.web3;
+      return callback(self.web3);
+    });
+  }
+
+  /**
    * @func setAccount
-   * Set up coinbase
+   * Set up coinbase (internal function)
    * @param {string} address 
    * @param {string} privateKey 
    * @param {function} passphrase 

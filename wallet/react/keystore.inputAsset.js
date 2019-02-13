@@ -1,16 +1,19 @@
 import React, { Component } from 'react';
 import { Button } from './core/buttons';
 
+const DEFAULT_STATE = {
+  filename: '',
+  keystore: null,
+  password: ''
+}
+
 
 class KeystoreAsset extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      visible: this.props.visible,
-      filename: null,
-      keystore: null,
-      password: null
+      ...DEFAULT_STATE
     }
 
     this.handleChangeFile = this.handleChangeFile.bind(this);
@@ -35,10 +38,13 @@ class KeystoreAsset extends Component {
   handleSubmit(e) {
     e.preventDefault();
     this.returnData2Parent();
+
+    // Clear history
+    this.setState(DEFAULT_STATE);
   }
 
   returnData2Parent() {
-    return this.props.done({
+    this.props.done({
       subType: 'keystore',
       asset: {
         keystore: this.state.keystore,
@@ -48,7 +54,6 @@ class KeystoreAsset extends Component {
   }
 
   render() {
-    if (!this.props.visible) return null;
     return (
       <div>
         <h3>Keystore</h3>

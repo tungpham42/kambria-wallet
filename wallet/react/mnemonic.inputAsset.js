@@ -1,15 +1,18 @@
 import React, { Component } from 'react';
 import { Button } from './core/buttons';
 
+const DEFAULT_STATE = {
+  mnemonic: '',
+  password: ''
+}
+
 
 class MnemonicAsset extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      visible: this.props.visible,
-      mnemonic: null,
-      password: null
+      ...DEFAULT_STATE
     }
 
     this.handleChangeMnemonic = this.handleChangeMnemonic.bind(this);
@@ -29,6 +32,9 @@ class MnemonicAsset extends Component {
   handleSubmit(e) {
     e.preventDefault();
     this.returnData2Parent();
+
+    // Clear history
+    this.setState(DEFAULT_STATE);
   }
 
   returnData2Parent() {
@@ -41,14 +47,7 @@ class MnemonicAsset extends Component {
     });
   }
 
-  componentDidUpdate(prevProps) {
-    if (this.props.visible !== prevProps.visible) {
-      this.setState({ visible: this.props.visible });
-    }
-  }
-
   render() {
-    if (!this.props.visible) return null;
     return (
       <div>
         <form>

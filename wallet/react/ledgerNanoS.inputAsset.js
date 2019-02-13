@@ -11,7 +11,6 @@ class LedgerNanoSAsset extends Component {
     super(props);
 
     this.state = {
-      visible: this.props.visible,
       counter: 0,
       message: 'Please connect the devide and click the button.'
     }
@@ -60,14 +59,7 @@ class LedgerNanoSAsset extends Component {
     });
   }
 
-  componentDidUpdate(prevProps) {
-    if (this.props.visible !== prevProps.visible) {
-      this.setState({ visible: this.props.visible });
-    }
-  }
-
   render() {
-    if (!this.props.visible) return null;
     return (
       <div>
         <h3>Ledger hardware</h3>

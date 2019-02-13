@@ -15,16 +15,9 @@ class HardWallet {
    *   index: (optional) ...
    * }
    */
-  constructor(net, accOpts) {
-    accOpts = accOpts || {};
+  constructor(net) {
     this.network = util.chainCode(net);
-    var engine = new Engine(this.network, this.opts());
     this.store = new Store();
-    this.hardware = null;
-    this.dpath = util.addDPath(accOpts.path, accOpts.index);
-    var ok = this.setAccount(accOpts.getAddress, accOpts.signTransaction);
-    if (!ok) throw new Error(error.CANNOT_SET_ACCOUNT);
-    this.web3 = engine.web3;
   }
 
   /**
@@ -62,6 +55,24 @@ class HardWallet {
   }
 
   /**
+   * @func init
+   * Initialize web3 
+   * @param {*} accOpts 
+   * @param {*} callback 
+   */
+  init(accOpts, callback) {
+    accOpts = accOpts || {};
+    var engine = new Engine(this.network, this.opts());
+    this.hardware = null;
+    this.dpath = util.addDPath(accOpts.path, accOpts.index);
+    var ok = this.setAccount(accOpts.getAddress, accOpts.signTransaction);
+    if (!ok) throw new Error(error.CANNOT_SET_ACCOUNT);
+    this.web3 = engine.web3;
+    // We used callback to fomalize code interface with other classes
+    return callback(this.web3);
+  }
+
+  /**
    * @func setAccount
    * Set up coinbase
    * @param {*} address 
@@ -77,7 +88,7 @@ class HardWallet {
     }
 
     this.hardware = { getAddress: getAddress, signTransaction: signTransaction };
-    return true
+    return true;
   }
 }
 

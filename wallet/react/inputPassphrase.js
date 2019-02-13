@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import Modal from 'react-bootstrap4-modal';
 import { Button } from './core/buttons';
 
+const DEFAULT_STATE = {
+  passphrase: ''
+}
 const ERROR = 'Used denied to enter passpharse';
 
 
@@ -11,7 +14,7 @@ class InputPassphrase extends Component {
 
     this.state = {
       visible: this.props.visible,
-      passphrase: null
+      ...DEFAULT_STATE
     }
 
     this.done = this.props.done;
@@ -24,13 +27,19 @@ class InputPassphrase extends Component {
   onClose() {
     this.setState({ visible: false });
     this.done(ERROR, null);
+
+    // Clear history
+    this.setState(DEFAULT_STATE);
   }
 
   handleSubmit(e) {
     e.preventDefault()
     this.setState({ visible: false });
-    if (!this.state.passphrase) return this.done(ERROR, null);
-    return this.done(null, this.state.passphrase);
+    if (!this.state.passphrase) this.done(ERROR, null);
+    else this.done(null, this.state.passphrase);
+
+    // Clear history
+    this.setState(DEFAULT_STATE);
   }
 
   onChange(e) {
@@ -39,7 +48,10 @@ class InputPassphrase extends Component {
 
   componentDidUpdate(prevProps) {
     if (this.props.visible !== prevProps.visible) {
-      this.setState({ visible: this.props.visible });
+      this.setState({
+        visible: this.props.visible,
+        ...DEFAULT_STATE
+      });
     }
   }
 
@@ -55,7 +67,7 @@ class InputPassphrase extends Component {
           <span className="title d-block text-center mt-4" style={{ "color": "#13CDAC", "fontSize": "24px" }}>Enter Passphrase</span>
           <p className="d-block text-center mb-4" style={{ "color": "#282F38", "fontSize": "16px", "lineHeight": "18px" }}>Please enter an temporary passphrase to proceed</p>
 
-          <input type="text" name="passphrase" value={this.state.passphrase} onChange={this.onChange} />
+          <input type="password" name="passphrase" value={this.state.passphrase} onChange={this.onChange} />
 
           <Button
             type="primary"

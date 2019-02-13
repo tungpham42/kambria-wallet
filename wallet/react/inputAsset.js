@@ -25,23 +25,17 @@ class InputAsset extends Component {
     }
 
     this.data = this.props.data;
-    this.done = this.props.done;
 
     this.onClose = this.onClose.bind(this);
-    this.onClickBackdrop = this.onClickBackdrop.bind(this);
     this.onChangeAsset = this.onChangeAsset.bind(this);
     this.onReceive = this.onReceive.bind(this);
     this.menu = this.menu.bind(this);
+    this.asset = this.asset.bind(this);
   }
 
   onClose(er) {
     this.setState({ visible: false });
-    this.done(er, null);
-  }
-
-  onClickBackdrop() {
-    this.setState({ visible: false });
-    this.done(ERROR, null);
+    this.props.done(er, null);
   }
 
   onChangeAsset(subType) {
@@ -49,7 +43,7 @@ class InputAsset extends Component {
   }
 
   onReceive(data) {
-    this.done(null, data);
+    this.props.done(null, data);
   }
 
   componentDidUpdate(prevProps) {
@@ -73,28 +67,29 @@ class InputAsset extends Component {
     return re;
   }
 
+  asset() {
+    if (this.state.subType === 'mnemonic') return <MnemonicAsset done={this.onReceive} />
+    if (this.state.subType === 'keystore') return <KeystoreAsset done={this.onReceive} />
+    if (this.state.subType === 'ledger-nano-s') return <LedgerNanoSAsset done={this.onReceive} />
+    if (this.state.subType === 'private-key') return <PrivateKeyAsset done={this.onReceive} />
+  }
+
   render() {
-    const value = 0;
     return (
       <Modal className="wallet-modal other-wallet"
         visible={this.state.visible}
-        onClickBackdrop={this.onClickBackdrop}
+        onClickBackdrop={() => this.onClose()}
         dialogClassName="modal-dialog-centered">
 
         <div className="modal-body">
-          <button type="button" className="close-button" onClick={this.onClose} />
+          <button type="button" className="close-button" onClick={() => this.onClose()} />
           <span className="title d-block text-center mt-4" style={{ "color": "#13CDAC", "fontSize": "24px" }}>Choose Your Wallet</span>
           <p className="d-block text-center mb-4" style={{ "color": "#282F38", "fontSize": "16px", "lineHeight": "18px" }}>Chose a wallet to access fully functional features</p>
           <ul className="wallet-menu">
             {this.menu()}
           </ul>
           <div className="wallet-content mb-5">
-
-            <MnemonicAsset visible={this.state.subType === 'mnemonic'} done={this.onReceive} />
-            <KeystoreAsset visible={this.state.subType === 'keystore'} done={this.onReceive} />
-            <LedgerNanoSAsset visible={this.state.subType === 'ledger-nano-s'} done={this.onReceive} />
-            <PrivateKeyAsset visible={this.state.subType === 'private-key'} done={this.onReceive} />
-
+            {this.state.visible ? this.asset() : null /* Tricky to clear history */}
           </div>
         </div>
 

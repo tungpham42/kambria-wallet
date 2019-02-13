@@ -9,11 +9,14 @@ const ERROR = 'No address found';
 const DEFAULT_HD_PATH = "m/44'/60'/0'/0";
 const LIMIT = 5, PAGE = 0;
 
-const GET_PASSPHRASE = function (callback) {
-  var passphrase = window.prompt('Please enter passphrase:');
-  if (!passphrase) return callback('User denied signing transaction', null);
-  return callback(null, passphrase)
+const DEFAULT_STATE = {
+  addressList: [],
+  selectedAddress: null,
+  i: 0,
+  limit: LIMIT,
+  page: PAGE
 }
+
 
 
 class ConfirmAddress extends Component {
@@ -22,17 +25,12 @@ class ConfirmAddress extends Component {
 
     this.state = {
       visible: this.props.visible,
-      addressList: [],
-      selectedAddress: null,
-      i: 0,
-      limit: LIMIT,
-      page: PAGE
+      ...DEFAULT_STATE
     }
 
     this.done = this.props.done;
 
     this.onClose = this.onClose.bind(this);
-    this.onClickBackdrop = this.onClickBackdrop.bind(this);
     this.onConfirm = this.onConfirm.bind(this);
     this.onSelect = this.onSelect.bind(this);
     this.onMore = this.onMore.bind(this);
@@ -49,28 +47,30 @@ class ConfirmAddress extends Component {
     this.done(er, null);
   }
 
-  onClickBackdrop() {
-    this.setState({ visible: false });
-    this.done(ERROR, null);
-  }
-
   onConfirm() {
     this.setState({ visible: false });
 
     // Confirm Metmask address
     if (this.props.data.wallet === 'metamask') {
       var metamask = this.setAddressByMetamask();
-      return this.done(null, { provider: metamask });
+      this.done(null, { provider: metamask });
     }
     // Confirm Isoxys address
     else if (this.props.data.wallet === 'isoxys') {
-      var isoxys = this.setAddressByIsoxys(this.props.data, this.state.i);
-      return this.done(null, { provider: isoxys });
+      var self = this;
+      this.setAddressByIsoxys(this.props.data, this.state.i).then(isoxys => {
+        self.done(null, { provider: isoxys });
+      }).catch(er => {
+        self.done(er, null);
+      });
     }
     // Error occurs
     else {
-      return this.onClose(ERROR);
+      this.onClose(ERROR);
     }
+
+    // Clear history
+    this.setState(DEFAULT_STATE);
   }
 
   onSelect(index, address) {
@@ -195,52 +195,58 @@ class ConfirmAddress extends Component {
   setAddressByIsoxys(data, i) {
     var isoxys = new Isoxys(data.net, data.type);
 
-    switch (data.subType) {
-      // Mnemonic
-      case 'mnemonic':
-        isoxys.setAccountByMnemonic(
-          data.asset.mnemonic,
-          data.asset.password,
-          DEFAULT_HD_PATH,
-          i,
-          GET_PASSPHRASE
-        );
-        return isoxys;
-      // Keystore
-      case 'keystore':
-        isoxys.setAccountByKeystore(
-          data.asset.keystore,
-          data.asset.password,
-          GET_PASSPHRASE
-        );
-        return isoxys;
-      // Ledger Nano S
-      case 'ledger-nano-s':
-        isoxys.setAccountByLedger(
-          DEFAULT_HD_PATH,
-          i
-        );
-        return isoxys;
-      // Private key
-      case 'private-key':
-        isoxys.setAccountByPrivatekey(
-          data.asset.privateKey,
-          GET_PASSPHRASE
-        );
-        return isoxys;
-      // Error
-      default:
-        return null;
-    }
+    return new Promise((resolve, reject) => {
+      switch (data.subType) {
+        // Mnemonic
+        case 'mnemonic':
+          return isoxys.setAccountByMnemonic(
+            data.asset.mnemonic,
+            data.asset.password,
+            DEFAULT_HD_PATH,
+            i,
+            window.GET_PASSPHRASE,
+            function () {
+              return resolve(isoxys);
+            });
+        // Keystore
+        case 'keystore':
+          return isoxys.setAccountByKeystore(
+            data.asset.keystore,
+            data.asset.password,
+            window.GET_PASSPHRASE,
+            function () {
+              return resolve(isoxys);
+            });
+        // Ledger Nano S
+        case 'ledger-nano-s':
+          return isoxys.setAccountByLedger(
+            DEFAULT_HD_PATH,
+            i,
+            function () {
+              return resolve(isoxys);
+            });
+        // Private key
+        case 'private-key':
+          return isoxys.setAccountByPrivatekey(
+            data.asset.privateKey,
+            window.GET_PASSPHRASE,
+            function () {
+              return resolve(isoxys);
+            });
+        // Error
+        default:
+          return reject(ERROR);
+      }
+    });
   }
 
   // UI conventions
-  showAddresses(addressList) {
+  showAddresses(defaultIndex, addressList) {
     var re = [];
     for (let i = 0; i < addressList.length; i++) {
       var item = (
         <label key={i} className="radio-wrapper">{addressList[i]}
-          <input type="radio" name="address" onChange={() => this.onSelect(i, addressList[i])} value={addressList[i]} />
+          <input type="radio" name="address" onChange={() => this.onSelect(i, addressList[i])} value={addressList[i]} checked={i === defaultIndex} />
           <span className="checkmark"></span>
         </label>
       );
@@ -260,16 +266,16 @@ class ConfirmAddress extends Component {
     return (
       <Modal className="wallet-modal choose-wallet-address"
         visible={this.state.visible}
-        onClickBackdrop={this.onClickBackdrop}
+        onClickBackdrop={() => this.onClose()}
         dialogClassName="modal-dialog-centered">
 
         <div className="modal-body">
-          <button type="button" className="close-button" onClick={this.onClose} />
+          <button type="button" className="close-button" onClick={() => this.onClose()} />
           <span className="title d-block text-center mt-4" style={{ "color": "#13CDAC", "fontSize": "24px" }}>Choose Your Wallet Address</span>
           <p className="d-block text-center mb-4" style={{ "color": "#282F38", "fontSize": "16px", "lineHeight": "18px" }}>Choose a wallet to access fully functional features</p>
 
           <div className="addresses">
-            {this.showAddresses(this.state.addressList)}
+            {this.showAddresses(this.state.i, this.state.addressList)}
             {this.moreBtn()}
           </div>
 

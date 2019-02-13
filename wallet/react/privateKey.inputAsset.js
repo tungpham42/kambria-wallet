@@ -1,14 +1,19 @@
 import React, { Component } from 'react';
 import { Button } from './core/buttons';
 
+const DEFAULT_STATE = {
+  privateKey: ''
+}
+
 
 class PrivateKeyAsset extends Component {
   constructor(props) {
     super(props);
 
+    console.log('=======')
+
     this.state = {
-      visible: this.props.visible,
-      privateKey: null
+      ...DEFAULT_STATE
     }
 
     this.handleChange = this.handleChange.bind(this);
@@ -22,6 +27,9 @@ class PrivateKeyAsset extends Component {
   handleSubmit(e) {
     e.preventDefault();
     this.returnData2Parent();
+
+    // Clear history
+    this.setState(DEFAULT_STATE);
   }
 
   returnData2Parent() {
@@ -34,7 +42,6 @@ class PrivateKeyAsset extends Component {
   }
 
   render() {
-    if (!this.props.visible) return null;
     return (
       <div>
         <form>

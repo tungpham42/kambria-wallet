@@ -3,16 +3,19 @@ import SellectWallet from './react/sellectWallet';
 import InputAsset from './react/inputAsset';
 import ConfirmAddress from './react/confirmAddress';
 import InputPassphrase from './react/inputPassphrase';
+import ErrorModal from './react/core/error';
 
 const ERROR = 'User denied to register';
 const DEFAULT_STATE = {
   step: null,
-  wallet: null,
-  type: null,
-  subType: null,
+  wallet: null, // null, metamask, isoxys
+  type: null, // softwallet, hardwallet
+  subType: null, // null, mnemonic, keystore, ledger-nano-s, private-key
   provider: null,
   asset: null,
-  passphrase: false
+  error: '',
+  passphrase: false,
+  callback: null
 }
 
 
@@ -23,23 +26,21 @@ class Wallet extends Component {
 
     this.state = {
       net: this.props.net ? this.props.net : 1, // mainnet as default
-      step: this.props.visible ? 'SellectWallet' : null,
-      wallet: null, // null, metamask, isoxys
-      type: null, // softwallet, hardwallet
-      subType: null, // null, mnemonic, keystore, ledger-nano-s, private-key
-      provider: null,
-      passphrase: false
+      ...DEFAULT_STATE
     }
+
+    if (this.props.visible) this.setState({ step: 'SelectWallet' });
 
     this.done = this.props.done;
     this.doneSellectWallet = this.doneSellectWallet.bind(this);
     this.doneInputAsset = this.doneInputAsset.bind(this);
     this.doneConfirmAddress = this.doneConfirmAddress.bind(this);
+    this.stop = this.stop.bind(this);
 
     var self = this;
     window.GET_PASSPHRASE = function (callback) {
-      self.setState({
-        passphrase: <InputPassphrase visible={true} done={callback} />
+      self.setState({ passphrase: false, callback: null }, function () {
+        self.setState({ passphrase: true, callback: callback });
       });
     }
   }
@@ -56,7 +57,8 @@ class Wallet extends Component {
    */
 
   doneSellectWallet(er, re) {
-    if (er || !re) return this.setState({ step: 'StopRegister' });
+    if (er) return this.setState({ error: er, step: 'Error' });
+    if (!re) return this.stop();
 
     if (re.wallet === 'metamask') {
       this.setState({
@@ -72,12 +74,13 @@ class Wallet extends Component {
       });
     }
     else {
-      this.setState({ step: 'StopRegister' });
+      return this.stop();
     }
   }
 
   doneInputAsset(er, re) {
-    if (er || !re) return this.setState({ step: 'StopRegister' });
+    if (er) return this.setState({ error: er, step: 'Error' });
+    if (!re) return this.stop();
 
     if (re.subType === 'mnemonic') {
       this.setState({
@@ -112,15 +115,19 @@ class Wallet extends Component {
       });
     }
     else {
-      this.setState({ step: 'StopRegister' });
+      return this.stop();
     }
   }
 
   doneConfirmAddress(er, re) {
-    console.log(er, re)
-    if (er || !re) this.done(ERROR, null);
+    if (er) return this.setState({ error: er, step: 'Error' });
+    else if (!re) return this.stop();
     else this.done(null, re.provider);
     return this.setState(DEFAULT_STATE);
+  }
+
+  stop() {
+    this.setState({ ...DEFAULT_STATE });
   }
 
   render() {
@@ -130,7 +137,8 @@ class Wallet extends Component {
         <SellectWallet visible={this.state.step === 'SellectWallet' && !this.state.passphrase} data={this.state} done={this.doneSellectWallet} />
         <InputAsset visible={this.state.step === 'InputAsset' && !this.state.passphrase} data={this.state} done={this.doneInputAsset} />
         <ConfirmAddress visible={this.state.step === 'ConfirmAddress' && !this.state.passphrase} data={this.state} done={this.doneConfirmAddress} />
-        {this.state.passphrase}
+        <InputPassphrase visible={this.state.passphrase} done={(er, re) => { this.state.callback(er, re) }} />
+        <ErrorModal visible={this.state.step === 'Error'} error={this.state.error} done={(er) => { console.log(er) }} />
       </div>
     )
   }

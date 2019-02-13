@@ -23,10 +23,15 @@ class Isoxys {
    * (Internal function) Set up acc to store that can be used as a wallet
    * @param {*} accOpts 
    */
-  setWallet(accOpts) {
-    this.provider = this.type === CONST.HARDWALLET ?
-      new Provider.HardWallet(this.net, accOpts) : new Provider.SoftWallet(this.net, accOpts);
-    this.web3 = this.provider.web3;
+  setWallet(accOpts, callback) {
+    var self = this;
+    this.provider = (this.type === CONST.HARDWALLET) ?
+      new Provider.HardWallet(this.net) :
+      new Provider.SoftWallet(this.net);
+    this.provider.init(accOpts, function (web3) {
+      self.web3 = web3;
+      return callback();
+    });
   }
 
   /**
@@ -42,14 +47,14 @@ class Isoxys {
    * @param {*} privatekey 
    * @param {function} getPassphrase 
    */
-  setAccountByPrivatekey(privatekey, getPassphrase) {
+  setAccountByPrivatekey(privatekey, getPassphrase, callback) {
     console.warn(`ATTENTION:
     This function is using private key in direct.
     Eventhought it was secured by some cryptographical functions,
     but we strongly recommend to avoid using it in the production environment.`);
     var account = Privatekey.privatekeyToAccount(privatekey);
     account.getPassphrase = getPassphrase;
-    this.setWallet(account);
+    this.setWallet(account, callback);
   }
 
   /**
@@ -106,12 +111,12 @@ class Isoxys {
    * @param {*} index - index of account
    * @param {function} getPassphrase - simulate the account locking/unlocking
    */
-  setAccountByMnemonic(mnemonic, password, path, index, getPassphrase) {
+  setAccountByMnemonic(mnemonic, password, path, index, getPassphrase, callback) {
     var seed = Mnemonic.mnemonicToSeed(mnemonic, password)
     var hdk = Mnemonic.seedToHDKey(seed);
     var account = Mnemonic.hdkeyToAccount(hdk, path, index);
     account.getPassphrase = getPassphrase;
-    this.setWallet(account);
+    this.setWallet(account, callback);
   }
 
   /**
@@ -146,10 +151,10 @@ class Isoxys {
    * @param {*} password - password
    * @param {function} getPassphrase - simulate the account locking/unlocking 
    */
-  setAccountByKeystore(input, password, getPassphrase) {
+  setAccountByKeystore(input, password, getPassphrase, callback) {
     var account = Keystore.recover(input, password);
     account.getPassphrase = getPassphrase;
-    this.setWallet(account);
+    this.setWallet(account, callback);
   }
 
   /**
@@ -175,14 +180,14 @@ class Isoxys {
    * @param {*} path - root derivation path (m/44'/60'/0' as default)
    * @param {*} index - (optional)
    */
-  setAccountByLedger(path, index) {
+  setAccountByLedger(path, index, callback) {
     var account = {
       getAddress: Ledger.getAddress,
       signTransaction: Ledger.signTransaction,
       path: path,
       index: index
     }
-    this.setWallet(account);
+    this.setWallet(account, callback);
   }
 
   /**
