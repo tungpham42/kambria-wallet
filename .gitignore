@@ -1,4 +1,8 @@
 /node_modules
-**dist
+/dist
 .DS_Store
 /index.js
+
+# CSS
+index.css
+index.css.map
