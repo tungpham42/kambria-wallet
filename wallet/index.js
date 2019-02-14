@@ -138,7 +138,7 @@ class Wallet extends Component {
         <InputAsset visible={this.state.step === 'InputAsset' && !this.state.passphrase} data={this.state} done={this.doneInputAsset} />
         <ConfirmAddress visible={this.state.step === 'ConfirmAddress' && !this.state.passphrase} data={this.state} done={this.doneConfirmAddress} />
         <InputPassphrase visible={this.state.passphrase} done={(er, re) => { this.state.callback(er, re) }} />
-        <ErrorModal visible={this.state.step === 'Error'} error={this.state.error} done={() => { this.done(this.state.error, null) }} />
+        <ErrorModal visible={this.state.step === 'Error' && !this.state.passphrase} error={this.state.error} done={() => { this.done(this.state.error, null) }} />
       </div>
     )
   }
