@@ -158,12 +158,11 @@
   .wallets {
     overflow: hidden;
     margin: 0 auto;
-    width: 360px;
+    width: 560px;
     .vl {
       border-left: 1px solid #E4E4E4;
       height: 154px;
       position: absolute;
-      left: 50%;
       margin-left: -3px;
       top: 130px;
     }
@@ -192,7 +191,18 @@
       &.metamask {
         margin-right: 24px;
         .icon {
-          background-image: url(../images/metamask.png);
+          background-image: url(../images/icon-metamask.png);
+        }
+      }
+      &.hardware {
+        margin-right: 24px;
+        .icon {
+          background-image: url(../images/icon-hardware-wallet.png);
+        }
+      }
+      &.software {
+        .icon {
+          background-image: url(../images/icon-software-wallet.png);
         }
       }
       &.other {
@@ -202,7 +212,16 @@
       }
     }  
   }
-  &.choose-wallet, &.choose-wallet-address, &.enter-passphrase, &.confirm-wallet-address {
+  &.choose-wallet {
+    .modal-content {
+      width: 720px;
+      min-width: 720px;
+    }
+    .modal-dialog {
+      max-width: 720px;
+    }
+  }
+  &.choose-wallet-address, &.enter-passphrase, &.confirm-wallet-address {
     .modal-content {
       width: 480px;
       min-width: 480px;
