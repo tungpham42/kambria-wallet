@@ -47,7 +47,7 @@ class TestWallet extends Component {
     var self = this;
     var provider = this.state.provider;
     provider.web3.eth.sendTransaction({
-      from: this.state.ACCOUNT,
+      from: self.state.ACCOUNT,
       to: '0x5a926b235e992d6ba52d98415e66afe5078a1690',
       value: '1000000000000000'
     }, function (er, txId) {

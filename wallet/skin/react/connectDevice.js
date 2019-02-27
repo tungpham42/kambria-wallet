@@ -1,33 +1,29 @@
 import React, { Component } from 'react';
 import Modal from 'react-bootstrap4-modal';
 
-import MnemonicAsset from './mnemonic.inputAsset';
-import KeystoreAsset from './keystore.inputAsset';
-import PrivateKeyAsset from './privateKey.inputAsset';
+import LedgerNanoSAsset from './ledgerNanoS.connectDevice';
 
 const MENU = [
-  { key: 'mnemonic', label: 'Seed' },
-  { key: 'keystore', label: 'Keystore' },
-  { key: 'private-key', label: 'Private Key' },
+  { key: 'ledger-nano-s', label: 'Ledger' },
 ];
 
 
-class InputAsset extends Component {
+class ConnectDevice extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       visible: this.props.visible,
-      subType: 'mnemonic'
+      subType: 'ledger-nano-s'
     }
 
     this.data = this.props.data;
 
     this.onClose = this.onClose.bind(this);
-    this.onChangeAsset = this.onChangeAsset.bind(this);
-    this.onReceive = this.onReceive.bind(this);
+    this.onChangeDevice = this.onChangeDevice.bind(this);
+    this.onConnect = this.onConnect.bind(this);
     this.menu = this.menu.bind(this);
-    this.asset = this.asset.bind(this);
+    this.device = this.device.bind(this);
   }
 
   onClose(er) {
@@ -35,11 +31,11 @@ class InputAsset extends Component {
     this.props.done(er, null);
   }
 
-  onChangeAsset(subType) {
+  onChangeDevice(subType) {
     this.setState({ subType: subType });
   }
 
-  onReceive(data) {
+  onConnect(data) {
     this.props.done(null, data);
   }
 
@@ -54,20 +50,18 @@ class InputAsset extends Component {
     for (let i = 0; i < MENU.length; i++) {
       var item = null;
       if (this.state.subType === MENU[i].key) {
-        item = <li className='active' key={i} onClick={() => this.onChangeAsset(MENU[i].key)}>{MENU[i].label}</li>
+        item = <li className='active' key={i} onClick={() => this.onChangeDevice(MENU[i].key)}>{MENU[i].label}</li>
       }
       else {
-        item = <li className='prev' key={i} onClick={() => this.onChangeAsset(MENU[i].key)}>{MENU[i].label}</li>
+        item = <li className='prev' key={i} onClick={() => this.onChangeDevice(MENU[i].key)}>{MENU[i].label}</li>
       }
       re.push(item);
     }
     return re;
   }
 
-  asset() {
-    if (this.state.subType === 'mnemonic') return <MnemonicAsset done={this.onReceive} />
-    if (this.state.subType === 'keystore') return <KeystoreAsset done={this.onReceive} />
-    if (this.state.subType === 'private-key') return <PrivateKeyAsset done={this.onReceive} />
+  device() {
+    if (this.state.subType === 'ledger-nano-s') return <LedgerNanoSAsset done={this.onConnect} />
   }
 
   render() {
@@ -85,7 +79,7 @@ class InputAsset extends Component {
             {this.menu()}
           </ul>
           <div className="wallet-content mb-5">
-            {this.state.visible ? this.asset() : null /* Tricky to clear history */}
+            {this.state.visible ? this.device() : null /* Tricky to clear history */}
           </div>
         </div>
 
@@ -94,4 +88,4 @@ class InputAsset extends Component {
   }
 }
 
-export default InputAsset;
+export default ConnectDevice;

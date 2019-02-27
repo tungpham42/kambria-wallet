@@ -57,8 +57,8 @@ class KeystoreAsset extends Component {
     return (
       <div>
         <h3>Keystore</h3>
-        <p className='type recommended'>This is a recommended way to access your wallet.</p>
-        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>
+        <p className='type not-recommended'>This is not a recommended way to access your wallet.</p>
+        <p></p>
 
         <div>
           <span className="label mt-3 d-block">Upload keystore</span>

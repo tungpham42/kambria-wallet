@@ -28,12 +28,12 @@ class SellectWallet extends Component {
 
   onMetamask() {
     this.setState({ visible: false });
-    this.done(null, { wallet: 'metamask' });
+    this.done(null, { wallet: 'metamask', type: 'softwallet' });
   }
 
-  onIsoxys() {
+  onIsoxys(type) {
     this.setState({ visible: false });
-    this.done(null, { wallet: 'isoxys' });
+    this.done(null, { wallet: 'isoxys', type: type });
   }
 
   componentDidUpdate(prevProps) {
@@ -59,15 +59,23 @@ class SellectWallet extends Component {
               <Button
                 type="primary"
                 size="sm"
-                onClick={this.onMetamask}>Use Metamask</Button>
+                onClick={this.onMetamask}>Metamask</Button>
             </div>
-            <div className="vl"></div>
-            <div className="wallet other">
+            <div className="vl" style={{ "left": "257px" }}></div>
+            <div className="wallet hardware">
               <div className="icon"></div>
               <Button
                 type="primary"
                 size="sm"
-                onClick={this.onIsoxys}>Use Other Wallet</Button>
+                onClick={() => this.onIsoxys('hardwallet')}>Hardware Wallet</Button>
+            </div>
+            <div className="vl" style={{ "left": "454px" }}></div>
+            <div className="wallet software">
+              <div className="icon"></div>
+              <Button
+                type="primary"
+                size="sm"
+                onClick={() => this.onIsoxys('softwallet')}>Software Wallet</Button>
             </div>
           </div>
           <p className="d-block text-center mt-5 mb-1" style={{ "color": "#9B9B9B", "fontSize": "16px", "lineHeight": "18px" }}>Or skip to website with limited function</p>
