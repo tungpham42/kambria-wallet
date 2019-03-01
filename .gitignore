@@ -1,3 +1,4 @@
+# Built files
 /node_modules
 /dist
 .DS_Store
@@ -6,3 +7,6 @@
 # CSS
 index.css
 index.css.map
+
+# Sensitive files
+.npmrc
