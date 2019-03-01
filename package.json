@@ -1,6 +1,6 @@
 {
   "name": "@kambria/kambria-wallet",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -12,18 +12,18 @@
     "pre-test": "npm run build && npm run fake-module",
     "fake-module": "rm -rf ./node_modules/@kambria && mkdir -p ./node_modules/@kambria/kambria-wallet && cp -R ./dist ./node_modules/@kambria/kambria-wallet/dist && cp ./index.js ./node_modules/@kambria/kambria-wallet/index.js",
     "build-js": "babel wallet -d dist && babel exports.js -o index.js",
-    "build-css": "npm run scss && cp -R ./wallet/skin/static ./dist/skin/static",
+    "build-css": "npm run scss && rsync -av --prune-empty-dirs --exclude='*.scss' ./wallet/skin/static/ ./dist/skin/static/",
     "scss": "sass ./wallet/skin/static/styles/index.scss ./wallet/skin/static/styles/index.css --style compressed"
   },
   "author": "tphanson <tphanson@kambria.io>",
   "license": "ISC",
   "dependencies": {
-    "@babel/polyfill": "^7.0.0",
+    "@babel/polyfill": "^7.2.5",
     "@fortawesome/fontawesome-svg-core": "^1.2.15",
     "@fortawesome/free-solid-svg-icons": "^5.7.2",
     "@fortawesome/react-fontawesome": "0.1.0-11",
-    "@ledgerhq/hw-app-eth": "^4.32.0",
-    "@ledgerhq/hw-transport-u2f": "^4.32.0",
+    "@ledgerhq/hw-app-eth": "^4.41.1",
+    "@ledgerhq/hw-transport-u2f": "^4.41.1",
     "async": "^2.6.1",
     "bip39": "^2.5.0",
     "connected-react-router": "^6.3.0",

@@ -51,6 +51,11 @@ class InputPassphrase extends Component {
       this.setState({
         visible: this.props.visible,
         ...DEFAULT_STATE
+      }, () => {
+        // Autofocus
+        setTimeout(() => {
+          if (this.passpharseName) this.passpharseName.focus();
+        }, 1);
       });
     }
   }
@@ -67,7 +72,11 @@ class InputPassphrase extends Component {
           <span className="title d-block text-center mt-4" style={{ "color": "#13CDAC", "fontSize": "24px" }}>Enter Passphrase</span>
           <p className="d-block text-center mb-4" style={{ "color": "#282F38", "fontSize": "16px", "lineHeight": "18px" }}>Please enter an temporary passphrase to proceed</p>
 
-          <input type="password" name="passphrase" value={this.state.passphrase} onChange={this.onChange} />
+          <input type="password"
+            name="passphrase"
+            value={this.state.passphrase}
+            onChange={this.onChange}
+            ref={(name) => { this.passpharseName = name; }} />
 
           <Button
             type="primary"

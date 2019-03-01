@@ -24,6 +24,8 @@ Ledger.getAddress = function (dpath, callback) {
       return callback(null, re.address);
     }).catch(er => {
       return callback(er, null);
+    }).finally(() => {
+      Ledger.closeTransport(transport);
     });
   });
 }
@@ -41,15 +43,16 @@ Ledger.signTransaction = function (dpath, rawTx, callback) {
       return callback(null, re);
     }).catch(er => {
       return callback(er, null);
+    }).finally(() => {
+      Ledger.closeTransport(transport);
     });
   });
 }
 
 Ledger.getTransport = function (callback) {
   TransportU2F.isSupported().then(re => {
-    if (!re) {
-      return callback(error.UNSUPPORT_U2F, null);
-    }
+    if (!re) return callback(error.UNSUPPORT_U2F, null);
+
     TransportU2F.create(_default.TIMEOUT, _default.TIMEOUT).then(re => {
       return callback(null, re);
     }).catch(er => {
@@ -58,6 +61,10 @@ Ledger.getTransport = function (callback) {
   }).catch(er => {
     return callback(er, null);
   });
+}
+
+Ledger.closeTransport = function (transport) {
+  return transport.close();
 }
 
 module.exports = Ledger;

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import SellectWallet from './skin/react/sellectWallet';
 import InputAsset from './skin/react/inputAsset';
+import ConnectDevice from './skin/react/connectDevice';
 import ConfirmAddress from './skin/react/confirmAddress';
 import InputPassphrase from './skin/react/inputPassphrase';
 import ErrorModal from './skin/react/core/error';
@@ -35,6 +36,7 @@ class Wallet extends Component {
     this.done = this.props.done;
     this.doneSellectWallet = this.doneSellectWallet.bind(this);
     this.doneInputAsset = this.doneInputAsset.bind(this);
+    this.doneConnectDevice = this.doneConnectDevice.bind(this);
     this.doneConfirmAddress = this.doneConfirmAddress.bind(this);
     this.stop = this.stop.bind(this);
 
@@ -62,21 +64,32 @@ class Wallet extends Component {
     if (!re) return this.stop();
 
     if (re.wallet === 'metamask') {
-      this.setState({
+      return this.setState({
         step: 'ConfirmAddress',
-        wallet: 'metamask',
-        type: 'softwallet'
+        wallet: re.wallet,
+        type: re.type
       });
     }
     else if (re.wallet === 'isoxys') {
-      this.setState({
-        step: 'InputAsset',
-        wallet: 'isoxys'
-      });
+      if (re.type == 'softwallet') {
+        return this.setState({
+          step: 'InputAsset',
+          wallet: re.wallet,
+          type: re.type
+        });
+      }
+      else { // hardwallet
+        return this.setState({
+          step: 'ConnectDevice',
+          wallet: re.wallet,
+          type: re.type
+        });
+      }
     }
     else {
       return this.stop();
     }
+
   }
 
   doneInputAsset(er, re) {
@@ -86,7 +99,6 @@ class Wallet extends Component {
     if (re.subType === 'mnemonic') {
       this.setState({
         step: 'ConfirmAddress',
-        type: 'softwallet',
         subType: 'mnemonic',
         asset: re.asset
       });
@@ -94,25 +106,31 @@ class Wallet extends Component {
     else if (re.subType === 'keystore') {
       this.setState({
         step: 'ConfirmAddress',
-        type: 'softwallet',
         subType: 'keystore',
-        asset: re.asset
-      });
-    }
-    else if (re.subType === 'ledger-nano-s') {
-      this.setState({
-        step: 'ConfirmAddress',
-        type: 'hardwallet',
-        subType: 'ledger-nano-s',
         asset: re.asset
       });
     }
     else if (re.subType === 'private-key') {
       this.setState({
         step: 'ConfirmAddress',
-        type: 'softwallet',
         subType: 'private-key',
         asset: re.asset
+      });
+    }
+    else {
+      return this.stop();
+    }
+  }
+
+  doneConnectDevice(er, re) {
+    if (er) return this.setState({ error: er, step: 'Error' });
+    if (!re) return this.stop();
+
+    if (re.subType === 'ledger-nano-s') {
+      this.setState({
+        step: 'ConfirmAddress',
+        subType: 'ledger-nano-s',
+        asset: null
       });
     }
     else {
@@ -136,6 +154,7 @@ class Wallet extends Component {
       <div>
         <SellectWallet visible={this.state.step === 'SellectWallet' && !this.state.passphrase} data={this.state} done={this.doneSellectWallet} />
         <InputAsset visible={this.state.step === 'InputAsset' && !this.state.passphrase} data={this.state} done={this.doneInputAsset} />
+        <ConnectDevice visible={this.state.step === 'ConnectDevice' && !this.state.passphrase} data={this.state} done={this.doneConnectDevice} />
         <ConfirmAddress visible={this.state.step === 'ConfirmAddress' && !this.state.passphrase} data={this.state} done={this.doneConfirmAddress} />
         <InputPassphrase visible={this.state.passphrase} done={(er, re) => { this.state.callback(er, re) }} />
         <ErrorModal visible={this.state.step === 'Error' && !this.state.passphrase} error={this.state.error} done={() => { this.done(this.state.error, null) }} />
