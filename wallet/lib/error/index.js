@@ -2,6 +2,7 @@ module.exports = {
   CANNOT_FOUND_PROVIDER: 'Cannot found provider',
   CANNOT_CONNECT_RPC: 'Cannot connect to RPC',
   CANNOT_GET_ACCOUNT: 'Cannot get account',
+  CANNOT_GET_BALANCE: 'Cannot get balance',
   CANNOT_SET_ACCOUNT: 'Cannot set account',
   CANNOT_UNLOCK_ACCOUNT: 'Cannot unlock account',
   INVALID_ADDRESS: 'Invalid address',
