@@ -263,7 +263,7 @@ class ConfirmAddress extends Component {
   }
 
   moreBtn() {
-    var btn = <Button type="primary-gray" size="sm" onClick={this.onMore} >Load More</Button>
+    var btn = <Button onClick={this.onMore} >Load More</Button>
     if (this.props.data.subType === 'mnemonic') return btn;
     if (this.props.data.subType === 'ledger-nano-s') return btn;
     return null;
@@ -299,8 +299,6 @@ class ConfirmAddress extends Component {
           }
 
           <Button
-            type="primary"
-            size="sm"
             customStyle={{ "display": "block", "margin": "8px auto 0" }}
             onClick={this.onConfirm}
           >Confirm</Button>

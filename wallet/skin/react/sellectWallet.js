@@ -57,31 +57,23 @@ class SellectWallet extends Component {
             <div className="wallet metamask">
               <div className="icon"></div>
               <Button
-                type="primary"
-                size="sm"
                 onClick={this.onMetamask}>Metamask</Button>
             </div>
             <div className="vl" style={{ "left": "257px" }}></div>
             <div className="wallet hardware">
               <div className="icon"></div>
               <Button
-                type="primary"
-                size="sm"
                 onClick={() => this.onIsoxys('hardwallet')}>Hardware Wallet</Button>
             </div>
             <div className="vl" style={{ "left": "454px" }}></div>
             <div className="wallet software">
               <div className="icon"></div>
               <Button
-                type="primary"
-                size="sm"
                 onClick={() => this.onIsoxys('softwallet')}>Software Wallet</Button>
             </div>
           </div>
           <p className="d-block text-center mt-5 mb-1" style={{ "color": "#9B9B9B", "fontSize": "16px", "lineHeight": "18px" }}>Or skip to website with limited function</p>
           <Button
-            type="gray"
-            size="sm"
             customStyle={{ "display": "block", "margin": "8px auto 0" }}
             onClick={() => this.onClose()}>Skip To Website</Button>
         </div>
