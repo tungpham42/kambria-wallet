@@ -16,7 +16,7 @@ class Metamask {
       ACCOUNT: null,
       BALANCE: null,
       CHANGED: null
-    }
+    };
     if (!window.web3 || !window.web3.currentProvider) throw new Error(error.CANNOT_FOUND_PROVIDER);
     this.web3 = new Web3(window.web3.currentProvider);
   }
@@ -69,9 +69,11 @@ class Metamask {
   getAccount() {
     var self = this;
     return new Promise((resolve, reject) => {
-      var re = self.web3.eth.coinbase;
-      if (!re || !self.isAddress(re)) return reject(error.CANNOT_GET_ACCOUNT);
-      return resolve(re);
+      self.web3.eth.getAccounts((er, re) => {
+        if (er) return reject(er);
+        if (re.length <= 0 || !re[0] || !self.isAddress(re[0])) return reject(error.CANNOT_GET_ACCOUNT);
+        return resolve(re[0]);
+      });
     });
   }
 
@@ -82,7 +84,7 @@ class Metamask {
   getBalance(address) {
     var self = this;
     return new Promise((resolve, reject) => {
-      if (!self.isAddress(address)) return reject(error.CANNOT_GET_ACCOUNT);
+      if (!self.isAddress(address)) return reject(error.CANNOT_GET_BALANCE);
       self.web3.eth.getBalance(address, (er, re) => {
         if (er) return reject(er);
         return resolve(Number(re));
@@ -129,6 +131,7 @@ class Metamask {
             return self.emitter.emit('data', data);
           }
         }).catch(er => {
+          self.USER.NETWORK = null;
           return self.emitter.emit('error', er);
         });
         // Watch switching account event
@@ -140,10 +143,11 @@ class Metamask {
             return self.emitter.emit('data', data);
           }
         }).catch(er => {
+          self.USER.ACCOUNT = null;
           return self.emitter.emit('error', er);
         });
         // Watch changing balance event
-        self.getBalance(self.USER.ACCOUNT).then(re => {
+        if (self.USER.ACCOUNT) self.getBalance(self.USER.ACCOUNT).then(re => {
           if (self.USER.BALANCE !== re) {
             self.USER.BALANCE = re;
             self.USER.CHANGED = CHANGED.BALANCE;
@@ -151,6 +155,7 @@ class Metamask {
             return self.emitter.emit('data', data);
           }
         }).catch(er => {
+          self.USER.BALANCE = null;
           return self.emitter.emit('error', er);
         });
       }, 2000);

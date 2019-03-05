@@ -65,8 +65,6 @@ class KeystoreAsset extends Component {
           <input id="keystore-file" type="file" accept="application/json" onChange={this.handleChangeFile} style={{ "display": "none" }} />
           <input type="text" value={this.state.filename} style={{ "width": "420px", "marginRight": "14px" }} disabled />
           <Button
-            type="primary-gray"
-            size="sm"
             onClick={() => { document.getElementById('keystore-file').click(); }}
           >Browse</Button>
 
@@ -75,8 +73,6 @@ class KeystoreAsset extends Component {
         </div>
 
         <Button
-          type="primary"
-          size="sm"
           customStyle={{ "float": "right", "marginTop": "24px", "width": "170px" }}
           onClick={this.handleSubmit}
         >OK</Button>

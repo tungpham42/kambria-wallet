@@ -79,8 +79,6 @@ class InputPassphrase extends Component {
             ref={(name) => { this.passpharseName = name; }} />
 
           <Button
-            type="primary"
-            size="sm"
             customStyle={{ "display": "block", "margin": "16px auto 0" }}
             onClick={this.handleSubmit}
           >Confirm</Button>

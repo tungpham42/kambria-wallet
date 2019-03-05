@@ -71,8 +71,6 @@ class LedgerNanoSAsset extends Component {
         </div>
 
         <Button
-          type="primary"
-          size="sm"
           customStyle={{ "float": "right", "marginTop": "24px", "width": "170px" }}
           onClick={this.checkTheConnection}
         >Connect</Button>

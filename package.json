@@ -1,6 +1,6 @@
 {
   "name": "@kambria/kambria-wallet",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -11,7 +11,7 @@
     "test": "npm run pre-test && HTTPS=true REACT_APP_ENV=development react-scripts start",
     "pre-test": "npm run build && npm run fake-module",
     "fake-module": "rm -rf ./node_modules/@kambria && mkdir -p ./node_modules/@kambria/kambria-wallet && cp -R ./dist ./node_modules/@kambria/kambria-wallet/dist && cp ./index.js ./node_modules/@kambria/kambria-wallet/index.js",
-    "build-js": "babel wallet -d dist && babel exports.js -o index.js",
+    "build-js": "babel exports.js -o index.js && babel wallet -d dist",
     "build-css": "npm run scss && rsync -av --prune-empty-dirs --exclude='*.scss' ./wallet/skin/static/ ./dist/skin/static/",
     "scss": "sass ./wallet/skin/static/styles/index.scss ./wallet/skin/static/styles/index.css --style compressed"
   },

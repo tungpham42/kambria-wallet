@@ -49,8 +49,6 @@ class ErrorModal extends Component {
           <p className="d-block text-center mb-4" style={{ "color": "#282F38", "fontSize": "16px", "lineHeight": "18px", "width": "380px", "margin": "auto" }}>We have problem reading your wallet address. Please try again.</p>
           <p className="d-block text-center mb-4" style={{ "color": "#282F38", "fontSize": "10px", "lineHeight": "18px", "width": "380px", "margin": "auto" }}>Detail: {this.state.error}</p>
           <Button
-            type="primary-gray"
-            size="sm"
             customStyle={{ "display": "block", "margin": "24px auto 12px", "width": "210px" }}
             onClick={this.onClose}
           >OK</Button>

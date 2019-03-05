@@ -32,7 +32,7 @@ Component <Wallet /> has 3 props:
 Basic use:
 
 ```
-import {Wallet} from '@kambria/krambria-wallet';
+import Wallet from '@kambria/kambria-wallet';
 
 // ... Something React here
 
@@ -44,7 +44,7 @@ render() {
 Advance use:
 
 ```
-import {Metamask, Isoxys} from '@kambria/krambria-wallet';
+import { Metamask, Isoxys } from '@kambria/kambria-wallet';
 
 // Recommend to view Example 2
 ```
