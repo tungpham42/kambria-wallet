@@ -7,13 +7,13 @@
     "release": "npm run build && npm publish",
     "start": "",
     "build": "npm run clean && npm run build-js && npm run build-css",
-    "clean": "rm -rf dist && rm -rf index.js",
+    "clean": "rm -rf temp && rm -rf index.js",
     "test": "npm run pre-test && HTTPS=true REACT_APP_ENV=development react-scripts start",
     "pre-test": "npm run build && npm run fake-module",
-    "fake-module": "rm -rf ./node_modules/@kambria && mkdir -p ./node_modules/@kambria/kambria-wallet && cp -R ./dist ./node_modules/@kambria/kambria-wallet/dist && cp ./index.js ./node_modules/@kambria/kambria-wallet/index.js",
-    "build-js": "babel exports.js -o index.js && babel wallet -d dist",
-    "build-css": "npm run scss && rsync -av --prune-empty-dirs --exclude='*.scss' ./wallet/skin/static/ ./dist/skin/static/",
-    "scss": "sass ./wallet/skin/static/styles/index.scss ./wallet/skin/static/styles/index.css --style compressed"
+    "fake-module": "rm -rf ./node_modules/@kambria && mkdir -p ./node_modules/@kambria/kambria-wallet && cp -R ./temp ./node_modules/@kambria/kambria-wallet/temp && cp ./index.js ./node_modules/@kambria/kambria-wallet/index.js",
+    "build-js": "babel exports.js -o index.js && babel wallet -d temp",
+    "build-css": "npm run scss && rsync -av --prune-empty-dirs --exclude='*.scss' ./wallet/skin/static/ ./temp/skin/static/",
+    "scss": "sass ./wallet/skin/static/styles/index.scss ./wallet/skin/static/styles/index.css"
   },
   "author": "tphanson <tphanson@kambria.io>",
   "license": "ISC",
