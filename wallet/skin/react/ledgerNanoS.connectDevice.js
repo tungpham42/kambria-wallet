@@ -68,7 +68,7 @@ class LedgerNanoSAsset extends Component {
     return (
       <div>
         <h3>Ledger hardware</h3>
-        <p className={cx("type", "not-recommended")}>This is a recommended way to access your wallet.</p>
+        <p className={cx("type", "recommended")}>This is a recommended way to access your wallet.</p>
         <p></p>
 
         <div>
