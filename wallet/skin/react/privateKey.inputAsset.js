@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Button } from './core/buttons';
 
+import '../static/styles/index.scss';
+
 const DEFAULT_STATE = {
   privateKey: ''
 }
@@ -48,11 +50,13 @@ class PrivateKeyAsset extends Component {
           <p></p>
 
           <div>
-            <span className="label mt-3 d-block">Enter private key</span>
+            <span className={cx("label", "mt-3", "d-block")}>Enter private key</span>
             <input type="text" value={this.state.privateKey} onChange={this.handleChange} />
           </div>
 
           <Button
+            type="primary"
+            size="sm"
             customStyle={{ "float": "right", "marginTop": "24px", "width": "170px" }}
             onClick={this.handleSubmit}
           >OK</Button>

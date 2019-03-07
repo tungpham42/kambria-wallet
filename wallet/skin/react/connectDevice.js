@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
-import Modal from 'react-bootstrap4-modal';
-
+import Modal from './core/modal';
 import LedgerNanoSAsset from './ledgerNanoS.connectDevice';
+
+// Setup CSS Module
+import classNames from 'classnames/bind';
+import style from 'Style/index.scss';
+var cx = classNames.bind(style);
 
 const MENU = [
   { key: 'ledger-nano-s', label: 'Ledger' },
@@ -50,10 +54,10 @@ class ConnectDevice extends Component {
     for (let i = 0; i < MENU.length; i++) {
       var item = null;
       if (this.state.subType === MENU[i].key) {
-        item = <li className='active' key={i} onClick={() => this.onChangeDevice(MENU[i].key)}>{MENU[i].label}</li>
+        item = <li className={cx("active")} key={i} onClick={() => this.onChangeDevice(MENU[i].key)}>{MENU[i].label}</li>
       }
       else {
-        item = <li className='prev' key={i} onClick={() => this.onChangeDevice(MENU[i].key)}>{MENU[i].label}</li>
+        item = <li className={cx("prev")} key={i} onClick={() => this.onChangeDevice(MENU[i].key)}>{MENU[i].label}</li>
       }
       re.push(item);
     }
@@ -66,19 +70,19 @@ class ConnectDevice extends Component {
 
   render() {
     return (
-      <Modal className="wallet-modal other-wallet"
+      <Modal className={cx("wallet-modal", "other-wallet")}
         visible={this.state.visible}
         onClickBackdrop={() => this.onClose()}
-        dialogClassName="modal-dialog-centered">
+        dialogClassName={cx("modal-dialog-centered")}>
 
-        <div className="modal-body">
-          <button type="button" className="close-button" onClick={() => this.onClose()} />
-          <span className="title d-block text-center mt-4" style={{ "color": "#13CDAC", "fontSize": "24px" }}>Choose Your Wallet</span>
-          <p className="d-block text-center mb-4" style={{ "color": "#282F38", "fontSize": "16px", "lineHeight": "18px" }}>Chose a wallet to access fully functional features</p>
-          <ul className="wallet-menu">
+        <div className={cx("modal-body")}>
+          <button type="button" className={cx("close-button")}  onClick={() => this.onClose()} />
+          <span className={cx("title d-block", "text-center", "mt-4")} style={{ "color": "#13CDAC", "fontSize": "24px" }}>Choose Your Wallet</span>
+          <p className={cx("d-block", "text-center", "mb-4")} style={{ "color": "#282F38", "fontSize": "16px", "lineHeight": "18px" }}>Chose a wallet to access fully functional features</p>
+          <ul className={cx("wallet-menu")}>
             {this.menu()}
           </ul>
-          <div className="wallet-content mb-5">
+          <div className={cx("wallet-content", "mb-5")}>
             {this.state.visible ? this.device() : null /* Tricky to clear history */}
           </div>
         </div>

@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Button } from './core/buttons';
 
+import '../static/styles/index.scss';
+
 const DEFAULT_STATE = {
   mnemonic: '',
   password: ''
@@ -56,14 +58,16 @@ class MnemonicAsset extends Component {
           <p></p>
 
           <div>
-            <span className="label mt-3 d-block">Enter seed</span>
+            <span className={cx("label", "mt-3", "d-block")}>Enter seed</span>
             <input type="text" value={this.state.mnemonic} onChange={this.handleChangeMnemonic} />
 
-            <span className="label mt-3 d-block">Enter password (Optional)</span>
+            <span className={cx("label", "mt-3", "d-block")}>Enter password (Optional)</span>
             <input type="password" value={this.state.password} onChange={this.handleChangePassword} />
           </div>
 
           <Button
+            type="primary"
+            size="sm"
             customStyle={{ "float": "right", "marginTop": "24px", "width": "170px" }}
             onClick={this.handleSubmit}
           >OK</Button>

@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Button } from './core/buttons';
 var Isoxys = require('../../lib/isoxys');
 
+import '../static/styles/index.scss';
+
 var COUNTER = 0;
 var TIMEOUT = 60;
 
@@ -67,10 +69,12 @@ class LedgerNanoSAsset extends Component {
         <p></p>
 
         <div>
-          <span className="label mt-3 d-block">{this.state.message} {this.state.counter ? <b>({this.state.counter}s)</b> : null}</span>
+          <span className={cx("label", "mt-3", "d-block")}>{this.state.message} {this.state.counter ? <b>({this.state.counter}s)</b> : null}</span>
         </div>
 
         <Button
+            type="primary"
+            size="sm"
           customStyle={{ "float": "right", "marginTop": "24px", "width": "170px" }}
           onClick={this.checkTheConnection}
         >Connect</Button>
