@@ -1,6 +1,7 @@
 # Built files
 /node_modules
 /dist
+/temp
 .DS_Store
 /index.js
 

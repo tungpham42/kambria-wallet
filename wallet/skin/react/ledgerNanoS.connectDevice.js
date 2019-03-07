@@ -2,6 +2,11 @@ import React, { Component } from 'react';
 import { Button } from './core/buttons';
 var Isoxys = require('../../lib/isoxys');
 
+// Setup CSS Module
+import classNames from 'classnames/bind';
+import style from 'Style/index.scss';
+var cx = classNames.bind(style);
+
 var COUNTER = 0;
 var TIMEOUT = 60;
 
@@ -63,14 +68,16 @@ class LedgerNanoSAsset extends Component {
     return (
       <div>
         <h3>Ledger hardware</h3>
-        <p className='type recommended'>This is a recommended way to access your wallet.</p>
+        <p className={cx("type", "not-recommended")}>This is a recommended way to access your wallet.</p>
         <p></p>
 
         <div>
-          <span className="label mt-3 d-block">{this.state.message} {this.state.counter ? <b>({this.state.counter}s)</b> : null}</span>
+          <span className={cx("label", "mt-3", "d-block")}>{this.state.message} {this.state.counter ? <b>({this.state.counter}s)</b> : null}</span>
         </div>
 
         <Button
+            type="primary"
+            size="sm"
           customStyle={{ "float": "right", "marginTop": "24px", "width": "170px" }}
           onClick={this.checkTheConnection}
         >Connect</Button>

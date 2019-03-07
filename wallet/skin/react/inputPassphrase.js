@@ -1,6 +1,11 @@
 import React, { Component } from 'react';
-import Modal from 'react-bootstrap4-modal';
+import Modal from './core/modal';
 import { Button } from './core/buttons';
+
+// Setup CSS Module
+import classNames from 'classnames/bind';
+import style from 'Style/index.scss';
+var cx = classNames.bind(style);
 
 const DEFAULT_STATE = {
   passphrase: ''
@@ -62,15 +67,15 @@ class InputPassphrase extends Component {
 
   render() {
     return (
-      <Modal className="wallet-modal enter-passphrase"
+      <Modal className={cx("wallet-modal", "enter-passphrase")}
         visible={this.state.visible}
         onClickBackdrop={this.onClose}
-        dialogClassName="modal-dialog-centered">
+        dialogClassName={cx("modal-dialog-centered")}>
 
-        <div className="modal-body">
-          <button type="button" className="close-button" onClick={this.onClose} />
-          <span className="title d-block text-center mt-4" style={{ "color": "#13CDAC", "fontSize": "24px" }}>Enter Passphrase</span>
-          <p className="d-block text-center mb-4" style={{ "color": "#282F38", "fontSize": "16px", "lineHeight": "18px" }}>Please enter an temporary passphrase to proceed</p>
+        <div className={cx("modal-body")}>
+          <button type="button" className={cx("close-button")} onClick={this.onClose} />
+          <span className={cx("title", "d-block", "text-center", "mt-4")} style={{ "color": "#13CDAC", "fontSize": "24px" }}>Enter Passphrase</span>
+          <p className={cx("d-block", "text-center", "mb-4")} style={{ "color": "#282F38", "fontSize": "16px", "lineHeight": "18px" }}>Please enter an temporary passphrase to proceed</p>
 
           <input type="password"
             name="passphrase"
@@ -79,6 +84,8 @@ class InputPassphrase extends Component {
             ref={(name) => { this.passpharseName = name; }} />
 
           <Button
+            type="primary"
+            size="sm"
             customStyle={{ "display": "block", "margin": "16px auto 0" }}
             onClick={this.handleSubmit}
           >Confirm</Button>

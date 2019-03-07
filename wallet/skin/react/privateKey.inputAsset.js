@@ -1,6 +1,11 @@
 import React, { Component } from 'react';
 import { Button } from './core/buttons';
 
+// Setup CSS Module
+import classNames from 'classnames/bind';
+import style from 'Style/index.scss';
+var cx = classNames.bind(style);
+
 const DEFAULT_STATE = {
   privateKey: ''
 }
@@ -44,15 +49,17 @@ class PrivateKeyAsset extends Component {
       <div>
         <form>
           <h3>Seed</h3>
-          <p className='type not-recommended'>This is not a recommended way to access your wallet.</p>
+          <p className={cx("type", "not-recommended")}>This is not a recommended way to access your wallet.</p>
           <p></p>
 
           <div>
-            <span className="label mt-3 d-block">Enter private key</span>
+            <span className={cx("label", "mt-3", "d-block")}>Enter private key</span>
             <input type="text" value={this.state.privateKey} onChange={this.handleChange} />
           </div>
 
           <Button
+            type="primary"
+            size="sm"
             customStyle={{ "float": "right", "marginTop": "24px", "width": "170px" }}
             onClick={this.handleSubmit}
           >OK</Button>

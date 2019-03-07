@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { Route, Link, Switch, Redirect } from 'react-router-dom';
 
+import Wallet from 'containers/wallet';
 import Metamask from 'containers/metamask';
 import Isoxys from 'containers/isoxys';
-import Wallet from 'containers/wallet';
 
 const margin = { marginRight: 1 + 'em' };
 

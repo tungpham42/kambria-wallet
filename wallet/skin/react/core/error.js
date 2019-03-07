@@ -1,6 +1,11 @@
 import React, { Component } from 'react';
-import Modal from 'react-bootstrap4-modal';
+import Modal from './modal';
 import { Button } from './buttons';
+
+// Setup CSS Module
+import classNames from 'classnames/bind';
+import style from 'Style/index.scss';
+var cx = classNames.bind(style);
 
 const DEFAULT_STATE = {
   error: ''
@@ -38,17 +43,19 @@ class ErrorModal extends Component {
 
   render() {
     return (
-      <Modal className="wallet-modal error-modal"
+      <Modal className={cx("wallet-modal", "error-modal")}
         visible={this.state.visible}
         onClickBackdrop={this.onClose}
-        dialogClassName="modal-dialog-centered">
+        dialogClassName={cx("modal-dialog-centered")}>
 
-        <div className="modal-body">
-          <button type="button" className="close-button" onClick={this.onClose} />
-          <span className="title d-block text-center mt-4" style={{ "color": "#D0021B", "fontSize": "24px" }}>Error!</span>
-          <p className="d-block text-center mb-4" style={{ "color": "#282F38", "fontSize": "16px", "lineHeight": "18px", "width": "380px", "margin": "auto" }}>We have problem reading your wallet address. Please try again.</p>
-          <p className="d-block text-center mb-4" style={{ "color": "#282F38", "fontSize": "10px", "lineHeight": "18px", "width": "380px", "margin": "auto" }}>Detail: {this.state.error}</p>
+        <div className={cx("modal-body")}>
+          <button type="button" className={cx("close-button")} onClick={this.onClose} />
+          <span className={cx("title", "d-block", "text-center", "mt-4")} style={{ "color": "#D0021B", "fontSize": "24px" }}>Error!</span>
+          <p className={cx("d-block", "text-center", "mb-4")} style={{ "color": "#282F38", "fontSize": "16px", "lineHeight": "18px", "width": "380px", "margin": "auto" }}>We have problem reading your wallet address. Please try again.</p>
+          <p className={cx("d-block", "text-center", "mb-4")} style={{ "color": "#282F38", "fontSize": "10px", "lineHeight": "18px", "width": "380px", "margin": "auto" }}>Detail: {this.state.error}</p>
           <Button
+            type="primary"
+            size="sm"
             customStyle={{ "display": "block", "margin": "24px auto 12px", "width": "210px" }}
             onClick={this.onClose}
           >OK</Button>

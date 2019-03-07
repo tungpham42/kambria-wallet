@@ -6,6 +6,10 @@ import store, { history } from 'store';
 
 import App from 'containers/app';
 
+// Testing CSS encapsulation
+// If the buttons turn to black, it would be failed
+import './faker.css';
+
 
 render(
   <Provider store={store}>

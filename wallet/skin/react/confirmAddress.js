@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
-import Modal from 'react-bootstrap4-modal';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import Modal from './core/modal';
 import { Button } from './core/buttons';
 
 var Metamask = require('../../lib/metamask');
 var Isoxys = require('../../lib/isoxys');
+
+// Setup CSS Module
+import classNames from 'classnames/bind';
+import style from 'Style/index.scss';
+var cx = classNames.bind(style);
 
 const ERROR = 'No address found';
 const DEFAULT_HD_PATH = "m/44'/60'/0'/0";
@@ -252,9 +255,9 @@ class ConfirmAddress extends Component {
     var re = [];
     for (let i = 0; i < addressList.length; i++) {
       var item = (
-        <label key={i} className="radio-wrapper">{addressList[i]}
+        <label key={i} className={cx("radio-wrapper")}>{addressList[i]}
           <input type="radio" name="address" onChange={() => this.onSelect(i, addressList[i])} value={addressList[i]} checked={i === defaultIndex} />
-          <span className="checkmark"></span>
+          <span className={cx("checkmark")}></span>
         </label>
       );
       re.push(item);
@@ -263,7 +266,8 @@ class ConfirmAddress extends Component {
   }
 
   moreBtn() {
-    var btn = <Button onClick={this.onMore} >Load More</Button>
+    var btn = <Button type="primary-gray" size="sm" onClick={this.onMore}
+    >Load More</Button>
     if (this.props.data.subType === 'mnemonic') return btn;
     if (this.props.data.subType === 'ledger-nano-s') return btn;
     return null;
@@ -271,20 +275,20 @@ class ConfirmAddress extends Component {
 
   render() {
     return (
-      <Modal className="wallet-modal choose-wallet-address"
+      <Modal className={cx("wallet-modal", "choose-wallet-address")}
         visible={this.state.visible}
         onClickBackdrop={() => this.onClose()}
-        dialogClassName="modal-dialog-centered">
+        dialogClassName={cx("modal-dialog-centered")}>
 
-        <div className="modal-body">
-          <button type="button" className="close-button" onClick={() => this.onClose()} />
-          <span className="title d-block text-center mt-4" style={{ "color": "#13CDAC", "fontSize": "24px" }}>Choose Your Wallet Address</span>
-          <p className="d-block text-center mb-4" style={{ "color": "#282F38", "fontSize": "16px", "lineHeight": "18px" }}>Choose a wallet to access fully functional features</p>
+        <div className={cx("modal-body")}>
+          <button type="button" className={cx("close-button")} onClick={() => this.onClose()} />
+          <span className={cx("title", "d-block", "text-center", "mt-4")} style={{ "color": "#13CDAC", "fontSize": "24px" }}>Choose Your Wallet Address</span>
+          <p className={cx("d-block", "text-center", "mb-4")} style={{ "color": "#282F38", "fontSize": "16px", "lineHeight": "18px" }}>Choose a wallet to access fully functional features</p>
 
           {
             (!this.state.addressList || this.state.addressList.length <= 0 || this.state.loading) ?
-              <div className="d-block text-center mb-4">
-                <FontAwesomeIcon icon={faSpinner} spin /> Loading address...
+              <div className={cx("d-block", "text-center", "mb-4")}>
+                Loading address...
               </div>
               : null
           }
@@ -292,13 +296,15 @@ class ConfirmAddress extends Component {
           {
             (!this.state.addressList || this.state.addressList.length <= 0) ?
               null :
-              <div className="addresses">
+              <div className={cx("addresses")}>
                 {this.showAddresses(this.state.i, this.state.addressList)}
                 {this.moreBtn()}
               </div>
           }
 
           <Button
+            type="primary"
+            size="sm"
             customStyle={{ "display": "block", "margin": "8px auto 0" }}
             onClick={this.onConfirm}
           >Confirm</Button>

@@ -6,22 +6,15 @@
   "scripts": {
     "release": "npm run build && npm publish",
     "start": "",
-    "build": "npm run clean && npm run build-js && npm run build-css",
-    "clean": "rm -rf dist && rm -rf index.js",
-    "test": "npm run pre-test && HTTPS=true REACT_APP_ENV=development react-scripts start",
-    "pre-test": "npm run build && npm run fake-module",
-    "fake-module": "rm -rf ./node_modules/@kambria && mkdir -p ./node_modules/@kambria/kambria-wallet && cp -R ./dist ./node_modules/@kambria/kambria-wallet/dist && cp ./index.js ./node_modules/@kambria/kambria-wallet/index.js",
-    "build-js": "babel exports.js -o index.js && babel wallet -d dist",
-    "build-css": "npm run scss && rsync -av --prune-empty-dirs --exclude='*.scss' ./wallet/skin/static/ ./dist/skin/static/",
-    "scss": "sass ./wallet/skin/static/styles/index.scss ./wallet/skin/static/styles/index.css --style compressed"
+    "clean": "rm -rf ./index.js && rm -rf ./node_modules/@kambria/kambria-wallet",
+    "build": "npm run clean && webpack && npm run fake-module",
+    "fake-module": "mkdir -p ./node_modules/@kambria/kambria-wallet && cp -R ./index.js ./node_modules/@kambria/kambria-wallet",
+    "test": "npm run build && HTTPS=true REACT_APP_ENV=development react-scripts start"
   },
   "author": "tphanson <tphanson@kambria.io>",
   "license": "ISC",
   "dependencies": {
     "@babel/polyfill": "^7.2.5",
-    "@fortawesome/fontawesome-svg-core": "^1.2.15",
-    "@fortawesome/free-solid-svg-icons": "^5.7.2",
-    "@fortawesome/react-fontawesome": "0.1.0-11",
     "@ledgerhq/hw-app-eth": "^4.41.1",
     "@ledgerhq/hw-transport-u2f": "^4.41.1",
     "async": "^2.6.1",
@@ -48,9 +41,19 @@
   "devDependencies": {
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.2.2",
+    "@babel/plugin-proposal-class-properties": "^7.3.4",
     "@babel/plugin-proposal-object-rest-spread": "^7.3.2",
     "@babel/preset-env": "^7.3.1",
-    "@babel/preset-react": "^7.0.0"
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.5",
+    "css-loader": "^2.1.0",
+    "node-sass": "^4.11.0",
+    "sass-loader": "^7.1.0",
+    "style-loader": "^0.23.1",
+    "terser-webpack-plugin": "^1.2.3",
+    "url-loader": "^1.1.2",
+    "webpack": "4.28.3",
+    "webpack-cli": "^3.2.3"
   },
   "browserslist": [
     ">0.2%",
