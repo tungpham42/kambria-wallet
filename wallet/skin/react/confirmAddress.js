@@ -287,9 +287,9 @@ class ConfirmAddress extends Component {
 
           {
             (!this.state.addressList || this.state.addressList.length <= 0 || this.state.loading) ?
-              <div className={cx("d-block", "text-center", "mb-4")}>
+              <p className={cx("d-block", "text-center", "mb-4")} style={{ "color": "#282F38", "fontSize": "16px", "lineHeight": "18px" }}>
                 Loading address...
-              </div>
+              </p>
               : null
           }
 
