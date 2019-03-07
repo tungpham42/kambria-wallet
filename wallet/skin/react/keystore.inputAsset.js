@@ -62,7 +62,7 @@ class KeystoreAsset extends Component {
     return (
       <div>
         <h3>Keystore</h3>
-        <p className='type not-recommended'>This is not a recommended way to access your wallet.</p>
+        <p className={cx("type", "not-recommended")}>This is not a recommended way to access your wallet.</p>
         <p></p>
 
         <div>

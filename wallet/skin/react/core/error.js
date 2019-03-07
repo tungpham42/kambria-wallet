@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Modal from 'react-bootstrap4-modal';
+import Modal from './modal';
 import { Button } from './buttons';
 
 // Setup CSS Module

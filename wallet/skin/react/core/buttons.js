@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 // Setup CSS Module
 import classNames from 'classnames/bind';
@@ -61,23 +60,23 @@ export const Button = (props) => {
     </button>;
 };
 
-export const IconButton = (props) =>
-  props.disabled ?
-    <button className={cx("btn", `btn-${props.type}`, `btn-${props.size}`)} style={{ color: props.color, backgroundColor: props.bgColor }} disabled>
-      <FontAwesomeIcon icon={props.icon} /> {props.children}
-    </button> :
-    <button className={cx("btn", `btn-${props.type}`, `btn-${props.size}`)} style={{ color: props.color, backgroundColor: props.bgColor }} onClick={props.onButtonClick}>
-      <FontAwesomeIcon icon={props.icon} /> {props.children}
-    </button>;
+// export const IconButton = (props) =>
+//   props.disabled ?
+//     <button className={cx("btn", `btn-${props.type}`, `btn-${props.size}`)} style={{ color: props.color, backgroundColor: props.bgColor }} disabled>
+//       <FontAwesomeIcon icon={props.icon} /> {props.children}
+//     </button> :
+//     <button className={cx("btn", `btn-${props.type}`, `btn-${props.size}`)} style={{ color: props.color, backgroundColor: props.bgColor }} onClick={props.onButtonClick}>
+//       <FontAwesomeIcon icon={props.icon} /> {props.children}
+//     </button>;
 
-export const ModalButton = (props) =>
-  props.disabled ?
-    <button className={cx("btn", `btn-${props.type}`, `btn-${props.size}`)} style={{ color: props.color, backgroundColor: props.bgColor }} data-toggle="modal" data-target="props.modalTarget" disabled>
-      {props.children}
-    </button> :
-    <button className={cx("btn", `btn-${props.type}`, `btn-${props.size}`)} style={{ color: props.color, backgroundColor: props.bgColor }} data-toggle="modal" data-target="props.modalTarget">
-      {props.children}
-    </button>;
+// export const ModalButton = (props) =>
+//   props.disabled ?
+//     <button className={cx("btn", `btn-${props.type}`, `btn-${props.size}`)} style={{ color: props.color, backgroundColor: props.bgColor }} data-toggle="modal" data-target="props.modalTarget" disabled>
+//       {props.children}
+//     </button> :
+//     <button className={cx("btn", `btn-${props.type}`, `btn-${props.size}`)} style={{ color: props.color, backgroundColor: props.bgColor }} data-toggle="modal" data-target="props.modalTarget">
+//       {props.children}
+//     </button>;
 
 Button.propTypes = {
   className: PropTypes.string,

@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import { Button } from './core/buttons';
 
-import '../static/styles/index.scss';
+// Setup CSS Module
+import classNames from 'classnames/bind';
+import style from 'Style/index.scss';
+var cx = classNames.bind(style);
 
 const DEFAULT_STATE = {
   privateKey: ''
@@ -46,7 +49,7 @@ class PrivateKeyAsset extends Component {
       <div>
         <form>
           <h3>Seed</h3>
-          <p className='type not-recommended'>This is not a recommended way to access your wallet.</p>
+          <p className={cx("type", "not-recommended")}>This is not a recommended way to access your wallet.</p>
           <p></p>
 
           <div>

@@ -83,7 +83,7 @@ class InputAsset extends Component {
 
         <div className={cx("modal-body")}>
           <button type="button" className={cx("close-button")} onClick={() => this.onClose()} />
-          <span className={cx("title d-block", "text-center", "mt-4")} style={{ "color": "#13CDAC", "fontSize": "24px" }}>Choose Your Wallet</span>
+          <span className={cx("title", "d-block", "text-center", "mt-4")} style={{ "color": "#13CDAC", "fontSize": "24px" }}>Choose Your Wallet</span>
           <p className={cx("d-block", "text-center", "mb-4")} style={{ "color": "#282F38", "fontSize": "16px", "lineHeight": "18px" }}>Chose a wallet to access fully functional features</p>
           <ul className={cx("wallet-menu")}>
             {this.menu()}

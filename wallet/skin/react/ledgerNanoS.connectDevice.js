@@ -2,7 +2,10 @@ import React, { Component } from 'react';
 import { Button } from './core/buttons';
 var Isoxys = require('../../lib/isoxys');
 
-import '../static/styles/index.scss';
+// Setup CSS Module
+import classNames from 'classnames/bind';
+import style from 'Style/index.scss';
+var cx = classNames.bind(style);
 
 var COUNTER = 0;
 var TIMEOUT = 60;
@@ -65,7 +68,7 @@ class LedgerNanoSAsset extends Component {
     return (
       <div>
         <h3>Ledger hardware</h3>
-        <p className='type recommended'>This is a recommended way to access your wallet.</p>
+        <p className={cx("type", "not-recommended")}>This is a recommended way to access your wallet.</p>
         <p></p>
 
         <div>

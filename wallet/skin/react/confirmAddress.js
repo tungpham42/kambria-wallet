@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
 import Modal from './core/modal';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { Button } from './core/buttons';
 
-import Metamask from '../../lib/metamask';
-import Isoxys from '../../lib/isoxys';
+var Metamask = require('../../lib/metamask');
+var Isoxys = require('../../lib/isoxys');
 
 // Setup CSS Module
 import classNames from 'classnames/bind';
@@ -290,7 +288,7 @@ class ConfirmAddress extends Component {
           {
             (!this.state.addressList || this.state.addressList.length <= 0 || this.state.loading) ?
               <div className={cx("d-block", "text-center", "mb-4")}>
-                <FontAwesomeIcon icon={faSpinner} spin /> Loading address...
+                Loading address...
               </div>
               : null
           }

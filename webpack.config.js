@@ -1,8 +1,9 @@
 const path = require('path');
+const TerserPlugin = require('terser-webpack-plugin');
 
 
 module.exports = {
-  entry: './exports.js',
+  entry: './main.js',
   output: {
     filename: 'index.js',
     path: path.resolve(__dirname),
@@ -29,7 +30,7 @@ module.exports = {
         }
       },
       {
-        test: /\.scss$/,
+        test: /\.*css$/,
         use: [
           'style-loader',
           {
@@ -47,6 +48,12 @@ module.exports = {
         loader: 'url-loader'
       },
     ]
+  },
+  plugins: [],
+  optimization: {
+    minimizer: [
+      new TerserPlugin()
+    ],
   },
   resolve: {
     alias: {
