@@ -1,3 +1,4 @@
+var WalletInterface = require('../walletInterface');
 var async = require("async");
 var util = require('../util');
 var Provider = require('../provider');
@@ -6,16 +7,17 @@ var Mnemonic = require('./mnemonic');
 var Keystore = require('./keystore');
 var Ledger = require('./ledger');
 
-const CONST = require('../const');
+const TYPE = require('../type');
 
 
-class Isoxys {
+class Isoxys extends WalletInterface {
 
   constructor(net, type) {
+    super();
+
     this.net = net;
     this.provider = null;
-    this.web3 = null;
-    this.type = type === CONST.HARDWALLET ? CONST.HARDWALLET : CONST.SOFTWALLET;
+    this.type = type === TYPE.HARDWALLET ? TYPE.HARDWALLET : TYPE.SOFTWALLET;
   }
 
   /**
@@ -25,7 +27,7 @@ class Isoxys {
    */
   setWallet(accOpts, callback) {
     var self = this;
-    this.provider = (this.type === CONST.HARDWALLET) ?
+    this.provider = (this.type === TYPE.HARDWALLET) ?
       new Provider.HardWallet(this.net) :
       new Provider.SoftWallet(this.net);
     this.provider.init(accOpts, function (web3) {
@@ -224,7 +226,6 @@ class Isoxys {
       return callback(null, []);
     }
   }
-
 }
 
 module.exports = Isoxys;

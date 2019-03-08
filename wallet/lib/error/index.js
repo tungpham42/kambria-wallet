@@ -10,5 +10,6 @@ module.exports = {
   INVALID_SEED: 'Invalid seed',
   INVALID_TX: 'Invalid transaction',
   UNSUPPORT_U2F: 'Browser did not support U2F',
-  CANNOT_CONNECT_HARDWARE: 'Cannot connect to hardware'
+  CANNOT_CONNECT_HARDWARE: 'Cannot connect to hardware',
+  META_STATUS_UNSUPPORTED: 'metaStatus function was not supported by this kind of wallet'
 }

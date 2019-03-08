@@ -29,9 +29,21 @@ class TestWallet extends Component {
   }
 
   done(er, provider) {
-    if (er) return console.error(er)
+    if (er) return console.error(er);
 
     var self = this;
+
+    provider.watch().then(watcher => {
+      watcher.event.on('data', re => {
+        console.log(re);
+      });
+      watcher.event.on('error', er => {
+        console.error(er)
+      });
+    }).catch(er => {
+      console.error(er)
+    });
+
     provider.web3.eth.getCoinbase(function (er, account) {
       if (er) return console.error(er);
       provider.web3.eth.getBalance(account, function (er, balance) {
