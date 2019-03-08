@@ -236,7 +236,7 @@ to know how to use them, you can refer to `src/*` for details.
 npm run build
 ```
 
-The `dist` folder would be the destination of compiling.
+The `index.js` file would be the destination of compiling (only one file).
 
 ## How to test?
 
@@ -249,12 +249,10 @@ Not yet
 ### Tool test
 
 ```
-npm test
+npm start
 ```
 
-The app will be run on port 5000 with https. (If the browser asks something, please trust it and process straight forward)
-
-*Notice that it is not supported hot-reloading outside `/src`, so you should re-run `npm test` manually for any code chaging.*
+The app will be run on port 5000 with https and support hot-loading. (If the browser asks something, please trust it and process straight forward)
 
 
 ## Cheatsheet
@@ -262,5 +260,5 @@ The app will be run on port 5000 with https. (If the browser asks something, ple
 | # | Commands | Descriptions |
 | :-: | - | - |
 | 1 | `npm install` | Install module packages |
-| 2 | `npm run build` | Build javascript libraries |
-| 3 | `npm test` | Run ui test |
+| 2 | `npm run build` | Build libraries in production|
+| 3 | `npm start` | Run tool test |
