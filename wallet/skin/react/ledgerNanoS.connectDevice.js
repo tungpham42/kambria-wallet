@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Button } from './core/buttons';
+import Loading from './core/loading';
 var Isoxys = require('../../lib/isoxys');
 
 // Setup CSS Module
@@ -7,8 +8,11 @@ import classNames from 'classnames/bind';
 import style from 'Style/index.scss';
 var cx = classNames.bind(style);
 
-var COUNTER = 0;
-var TIMEOUT = 60;
+const STATUS = {
+  INIT: 'Please connect the devide and click the button!',
+  TEST: 'Connecting',
+  FAIL: 'Cannot connect the devide!'
+}
 
 
 class LedgerNanoSAsset extends Component {
@@ -16,46 +20,23 @@ class LedgerNanoSAsset extends Component {
     super(props);
 
     this.state = {
-      counter: 0,
-      message: 'Please connect the devide and click the button.'
+      message: STATUS.INIT
     }
 
-    this.counter = this.counter.bind(this);
     this.checkTheConnection = this.checkTheConnection.bind(this);
     this.returnData2Parent = this.returnData2Parent.bind(this);
   }
 
   checkTheConnection() {
     var self = this;
-    this.setState({ counter: 1, message: 'Connecting...' });
-    this.counter(function () {
-      // In case no device connected
-      self.setState({ counter: 0, message: 'Cannot connect the devide.' });
-    });
+    this.setState({ message: STATUS.TEST });
     // Fetch the first address to know whether devide connected
     var isoxys = new Isoxys(null /** Use default for testing */, 'hardWallet');
     isoxys.getAccountsByLedger("m/44'/60'/0'", 1, 0, function (er, re) {
-      if (er || re.lenght <= 0) {
-        return self.setState({ counter: 0, message: 'Cannot connect the devide.' });
-      }
+      if (er || re.lenght <= 0) return self.setState({ message: STATUS.FAIL });
 
-      self.returnData2Parent();
-      return self.setState({ counter: 0, message: 'Found a devide.' });
+      return self.returnData2Parent();
     });
-  }
-
-  counter(callback) {
-    var self = this;
-    clearInterval(COUNTER);
-    COUNTER = null;
-    COUNTER = setInterval(function () {
-      if (self.state.counter >= 1) self.setState({ counter: self.state.counter + 1 });
-      if (self.state.counter >= TIMEOUT) {
-        clearInterval(COUNTER);
-        COUNTER = null;
-        return callback();
-      }
-    }, 1000);
   }
 
   returnData2Parent() {
@@ -72,12 +53,15 @@ class LedgerNanoSAsset extends Component {
         <p></p>
 
         <div>
-          <span className={cx("label", "mt-3", "d-block")}>{this.state.message} {this.state.counter ? <b>({this.state.counter}s)</b> : null}</span>
+          <span className={cx("label", "mt-3", "d-block")}>
+            {this.state.message}
+            {this.state.message === STATUS.TEST ? <Loading /> : null}
+          </span>
         </div>
 
         <Button
-            type="primary"
-            size="sm"
+          type="primary"
+          size="sm"
           customStyle={{ "float": "right", "marginTop": "24px", "width": "170px" }}
           onClick={this.checkTheConnection}
         >Connect</Button>

@@ -21,7 +21,7 @@ class App extends Component {
             <Redirect exact from='/' to='/wallet' />
             <Route exact path='/wallet' component={Wallet} />
             <Route exact path='/metamask' component={Metamask} />
-            <Route exact path='/isoxys ' component={Isoxys} />
+            <Route exact path='/isoxys' component={Isoxys} />
           </Switch>
         </main>
       </div>

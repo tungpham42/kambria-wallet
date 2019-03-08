@@ -5,11 +5,13 @@
   "main": "index.js",
   "scripts": {
     "release": "npm run build && npm publish",
-    "start": "",
+    "build": "npm run clean && webpack --mode=producttion",
     "clean": "rm -rf ./index.js && rm -rf ./node_modules/@kambria/kambria-wallet",
-    "build": "npm run clean && webpack && npm run fake-module",
+    "start": "nodemon --exec 'npm run dev && npm run serve'",
+    "serve": "HTTPS=true REACT_APP_ENV=development react-scripts start",
+    "dev": "webpack --mode=development && npm run fake-module",
     "fake-module": "mkdir -p ./node_modules/@kambria/kambria-wallet && cp -R ./index.js ./node_modules/@kambria/kambria-wallet",
-    "test": "npm run build && HTTPS=true REACT_APP_ENV=development react-scripts start"
+    "test": ""
   },
   "author": "tphanson <tphanson@kambria.io>",
   "license": "ISC",
@@ -26,6 +28,7 @@
     "async": "^2.6.1",
     "babel-loader": "^8.0.5",
     "bip39": "^2.5.0",
+    "classnames": "^2.2.6",
     "connected-react-router": "^6.3.0",
     "crypto-js": "^3.1.9-1",
     "css-loader": "^2.1.0",
@@ -35,6 +38,7 @@
     "hdkey": "^1.1.0",
     "keythereum": "^1.0.4",
     "node-sass": "^4.11.0",
+    "nodemon": "^1.18.10",
     "prop-types": "^15.7.1",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",

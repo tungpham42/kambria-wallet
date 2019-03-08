@@ -51,23 +51,31 @@ class TestIsoxys extends Component {
 
     this.isoxys = new Isoxys(NETWORK, TYPE);
 
-    this.isoxys.setAccountByMnemonic(accOpts.mnemonic, accOpts.password, null, 0, getPassphrase);
-    // this.isoxys.setAccountByKeystore(accOpts.keystore, accOpts.password, accOpts.version, getPassphrase);
-    // this.isoxys.setAccountByLedger();
+    var _test = function () {
+      self.isoxys.web3.eth.getCoinbase(function (er, re) {
+        if (er) return self.setState({ ERROR: er.toString() });
+        self.setState({ ADDRESS: re })
 
-    this.isoxys.web3.eth.getCoinbase(function (er, re) {
-      if (er) return self.setState({ ERROR: er.toString() });
-      self.setState({ ADDRESS: re })
+        self.getBalance(re);
+      });
+      self.INSTANCE = self.isoxys.web3.eth.contract(CONTRACT.ABI).at(CONTRACT.ADDRESS);
 
-      self.getBalance(re);
+      // Event listener
+      self.INSTANCE.Next(function (er, re) {
+        if (er) return self.setState({ ERROR: er.toString() });
+        return self.setState({ FIBONACCI: re.args.b.toString() });
+      });
+    }
+
+    this.isoxys.setAccountByMnemonic(accOpts.mnemonic, accOpts.password, null, 0, getPassphrase, () => {
+      _test();
     });
-    this.INSTANCE = this.isoxys.web3.eth.contract(CONTRACT.ABI).at(CONTRACT.ADDRESS);
-
-    // Event listener
-    this.INSTANCE.Next(function (er, re) {
-      if (er) return self.setState({ ERROR: er.toString() });
-      return self.setState({ FIBONACCI: re.args.b.toString() });
-    });
+    // this.isoxys.setAccountByKeystore(accOpts.keystore, accOpts.password, getPassphrase, ()=>{
+    //   _test();
+    // });
+    // this.isoxys.setAccountByLedger(null,null, () => {
+    //   _test();
+    // });
   }
 
   getBalance(address) {

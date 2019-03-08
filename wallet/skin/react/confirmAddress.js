@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Modal from './core/modal';
+import Loading from './core/loading';
 import { Button } from './core/buttons';
 
 var Metamask = require('../../lib/metamask');
@@ -288,7 +289,7 @@ class ConfirmAddress extends Component {
           {
             (!this.state.addressList || this.state.addressList.length <= 0 || this.state.loading) ?
               <p className={cx("d-block", "text-center", "mb-4")} style={{ "color": "#282F38", "fontSize": "16px", "lineHeight": "18px" }}>
-                Loading address...
+                Loading address<Loading/>
               </p>
               : null
           }
