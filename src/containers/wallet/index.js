@@ -8,10 +8,11 @@ class TestWallet extends Component {
     this.state = {
       visible: false,
       provider: null,
-      ACCOUNT: null,
-      BALANCE: null,
-      TXID: null,
-      ERROR: null
+      network: null,
+      account: null,
+      balance: null,
+      txId: null,
+      error: null
     }
 
     this.register = this.register.bind(this);
@@ -29,27 +30,18 @@ class TestWallet extends Component {
   }
 
   done(er, provider) {
-    if (er) return console.error(er);
-
     var self = this;
+    if (er) return this.setState({ error: JSON.stringify(er) });
 
     provider.watch().then(watcher => {
       watcher.event.on('data', re => {
-        console.log(re);
+        return self.setState(re);
       });
       watcher.event.on('error', er => {
-        console.error(er)
+        return self.setState({ error: JSON.stringify(er) });
       });
     }).catch(er => {
-      console.error(er)
-    });
-
-    provider.web3.eth.getCoinbase(function (er, account) {
-      if (er) return console.error(er);
-      provider.web3.eth.getBalance(account, function (er, balance) {
-        if (er) return console.error(er);
-        self.setState({ ACCOUNT: account, BALANCE: Number(balance) });
-      })
+      return self.setState({ error: JSON.stringify(er) });
     });
 
     return this.setState({ provider: provider });
@@ -59,12 +51,12 @@ class TestWallet extends Component {
     var self = this;
     var provider = this.state.provider;
     provider.web3.eth.sendTransaction({
-      from: self.state.ACCOUNT,
+      from: self.state.account,
       to: '0x5a926b235e992d6ba52d98415e66afe5078a1690',
       value: '1000000000000000'
     }, function (er, txId) {
-      if (er) return self.setState({ ERROR: JSON.stringify(er) });
-      return self.setState({ TXID: txId.toString() });
+      if (er) return self.setState({ error: JSON.stringify(er) });
+      return self.setState({ txId: txId.toString() });
     });
   }
 
@@ -75,11 +67,12 @@ class TestWallet extends Component {
         <button onClick={() => this.register(true)}>Register</button>
 
         <div>
-          <p>Account: {this.state.ACCOUNT}</p>
-          <p>Balance: {this.state.BALANCE}</p>
-          <p>Previous tx id: <a target="_blank" rel="noopener noreferrer" href={"https://rinkeby.etherscan.io/tx/" + this.state.TXID}>{this.state.TXID}</a></p>
+          <p>Network: {this.state.network}</p>
+          <p>Account: {this.state.account}</p>
+          <p>Balance: {this.state.balance}</p>
+          <p>Previous tx id: <a target="_blank" rel="noopener noreferrer" href={"https://rinkeby.etherscan.io/tx/" + this.state.txId}>{this.state.txId}</a></p>
           <button onClick={this.sendTx}>Send Tx</button>
-          {this.state.ERROR ? <a >{this.state.ERROR}</a> : null}
+          {this.state.error ? <a >{this.state.error}</a> : null}
         </div>
         <Wallet visible={this.state.visible} net={4} done={this.done} />
       </div>
