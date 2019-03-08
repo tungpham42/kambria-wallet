@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "release": "npm run build && npm publish",
-    "build": "npm run clean && webpack --mode=producttion",
+    "build": "npm run clean && webpack --mode=production",
     "clean": "rm -rf ./index.js && rm -rf ./node_modules/@kambria/kambria-wallet",
     "start": "nodemon --exec 'npm run dev && npm run serve'",
     "serve": "HTTPS=true REACT_APP_ENV=development react-scripts start",
