@@ -5,11 +5,12 @@ module.exports = {
   CANNOT_GET_BALANCE: 'Cannot get balance',
   CANNOT_SET_ACCOUNT: 'Cannot set account',
   CANNOT_UNLOCK_ACCOUNT: 'Cannot unlock account',
+  INVALID_NETWORK: 'Invalid network',
   INVALID_ADDRESS: 'Invalid address',
   INVALID_MNEMONIC: 'Invalid mnemonic',
   INVALID_SEED: 'Invalid seed',
   INVALID_TX: 'Invalid transaction',
   UNSUPPORT_U2F: 'Browser did not support U2F',
   CANNOT_CONNECT_HARDWARE: 'Cannot connect to hardware',
-  META_STATUS_UNSUPPORTED: 'metaStatus function was not supported by this kind of wallet'
+  META_STATUS_UNSUPPORTED: 'metaStatus function was not supported by this kind of wallet',
 }

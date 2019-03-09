@@ -7,17 +7,10 @@ var Mnemonic = require('./mnemonic');
 var Keystore = require('./keystore');
 var Ledger = require('./ledger');
 
-const TYPE = require('../type');
-
 
 class Isoxys extends WalletInterface {
-
-  constructor(net, type) {
-    super();
-
-    this.net = net;
-    this.provider = null;
-    this.type = type === TYPE.HARDWALLET ? TYPE.HARDWALLET : TYPE.SOFTWALLET;
+  constructor(net, type, restrict) {
+    super(net, type, restrict);
   }
 
   /**
@@ -30,9 +23,10 @@ class Isoxys extends WalletInterface {
     this.provider = (this.type === TYPE.HARDWALLET) ?
       new Provider.HardWallet(this.net) :
       new Provider.SoftWallet(this.net);
-    this.provider.init(accOpts, function (web3) {
+    this.provider.init(accOpts, function (er, web3) {
+      if (er) return callback(er, null);
       self.web3 = web3;
-      return callback();
+      return callback(null, web3);
     });
   }
 

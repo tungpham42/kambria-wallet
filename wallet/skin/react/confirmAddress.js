@@ -3,7 +3,6 @@ import Modal from './core/modal';
 import Loading from './core/loading';
 import { Button } from './core/buttons';
 
-var Metamask = require('../../lib/metamask');
 var Isoxys = require('../../lib/isoxys');
 
 // Setup CSS Module
@@ -55,17 +54,11 @@ class ConfirmAddress extends Component {
   }
 
   onConfirm() {
+    var self = this;
     this.setState({ visible: false });
-
-    // Confirm Metmask address
-    if (this.props.data.wallet === 'metamask') {
-      var metamask = this.setAddressByMetamask();
-      this.done(null, { provider: metamask });
-    }
     // Confirm Isoxys address
-    else if (this.props.data.wallet === 'isoxys') {
-      var self = this;
-      this.setAddressByIsoxys(this.props.data, this.state.i).then(isoxys => {
+    if (this.props.data.wallet === 'isoxys') {
+      this.initIsoxys(this.props.data, this.state.i).then(isoxys => {
         self.done(null, { provider: isoxys });
       }).catch(er => {
         self.done(er, null);
@@ -114,14 +107,8 @@ class ConfirmAddress extends Component {
    * Data controllers
    */
   getAddress(data) {
-    if (data.wallet === 'metamask') {
-      this.getAddressByMetamask().then(re => {
-        return this.setState({ addressList: re });
-      }).catch(er => {
-        if (er) return this.onClose(ERROR);
-      });
-    }
-    else if (data.wallet === 'isoxys') {
+    // We don't need to get address in case of metamask
+    if (data.wallet === 'isoxys') {
       this.getAddressByIsoxys(data, this.state.limit, this.state.page).then(re => {
         return this.setState({ addressList: re });
       }).catch(er => {
@@ -136,25 +123,8 @@ class ConfirmAddress extends Component {
   /**
    * Wallet conventions
    */
-  getAddressByMetamask() {
-    var metamask = new Metamask();
-    return new Promise((resolve, reject) => {
-      metamask.getAccount().then(re => {
-        return resolve([re]);
-      }).catch(er => {
-        return reject(er);
-      });
-    });
-  }
-
-  setAddressByMetamask() {
-    var metamask = new Metamask();
-    return metamask;
-  }
-
   getAddressByIsoxys(data, limit, page) {
-    var isoxys = new Isoxys(data.net, data.type);
-
+    var isoxys = new Isoxys(data.net, data.type, true);
     return new Promise((resolve, reject) => {
       switch (data.subType) {
         // Mnemonic
@@ -203,9 +173,8 @@ class ConfirmAddress extends Component {
     });
   }
 
-  setAddressByIsoxys(data, i) {
-    var isoxys = new Isoxys(data.net, data.type);
-
+  initIsoxys(data, i) {
+    var isoxys = new Isoxys(data.net, data.type, true);
     return new Promise((resolve, reject) => {
       switch (data.subType) {
         // Mnemonic
@@ -216,7 +185,8 @@ class ConfirmAddress extends Component {
             DEFAULT_HD_PATH,
             i,
             window.GET_PASSPHRASE,
-            function () {
+            function (er, re) {
+              if (er) return reject(er);
               return resolve(isoxys);
             });
         // Keystore
@@ -225,7 +195,8 @@ class ConfirmAddress extends Component {
             data.asset.keystore,
             data.asset.password,
             window.GET_PASSPHRASE,
-            function () {
+            function (er, re) {
+              if (er) return reject(er);
               return resolve(isoxys);
             });
         // Ledger Nano S
@@ -233,7 +204,8 @@ class ConfirmAddress extends Component {
           return isoxys.setAccountByLedger(
             DEFAULT_HD_PATH,
             i,
-            function () {
+            function (er, re) {
+              if (er) return reject(er);
               return resolve(isoxys);
             });
         // Private key
@@ -241,7 +213,8 @@ class ConfirmAddress extends Component {
           return isoxys.setAccountByPrivatekey(
             data.asset.privateKey,
             window.GET_PASSPHRASE,
-            function () {
+            function (er, re) {
+              if (er) return reject(er);
               return resolve(isoxys);
             });
         // Error
@@ -289,7 +262,7 @@ class ConfirmAddress extends Component {
           {
             (!this.state.addressList || this.state.addressList.length <= 0 || this.state.loading) ?
               <p className={cx("d-block", "text-center", "mb-4")} style={{ "color": "#282F38", "fontSize": "16px", "lineHeight": "18px" }}>
-                Loading address<Loading/>
+                Loading address<Loading />
               </p>
               : null
           }

@@ -7,6 +7,7 @@ import InputPassphrase from './skin/react/inputPassphrase';
 import ErrorModal from './skin/react/core/error';
 
 
+const ERROR = 'Wallet is not supported.';
 const DEFAULT_STATE = {
   step: null,
   wallet: null, // null, metamask, isoxys
@@ -37,7 +38,7 @@ class Wallet extends Component {
     this.doneInputAsset = this.doneInputAsset.bind(this);
     this.doneConnectDevice = this.doneConnectDevice.bind(this);
     this.doneConfirmAddress = this.doneConfirmAddress.bind(this);
-    this.stop = this.stop.bind(this);
+    this.end = this.end.bind(this);
 
     var self = this;
     window.GET_PASSPHRASE = function (callback) {
@@ -60,14 +61,9 @@ class Wallet extends Component {
 
   doneSellectWallet(er, re) {
     if (er) return this.setState({ error: er, step: 'Error' });
-    if (!re) return this.stop();
 
     if (re.wallet === 'metamask') {
-      return this.setState({
-        step: 'ConfirmAddress',
-        wallet: re.wallet,
-        type: re.type
-      });
+      return this.end(null, re);
     }
     else if (re.wallet === 'isoxys') {
       if (re.type == 'softwallet') {
@@ -86,14 +82,13 @@ class Wallet extends Component {
       }
     }
     else {
-      return this.stop();
+      return this.setState({ error: ERROR, step: 'Error' });
     }
 
   }
 
   doneInputAsset(er, re) {
     if (er) return this.setState({ error: er, step: 'Error' });
-    if (!re) return this.stop();
 
     if (re.subType === 'mnemonic') {
       this.setState({
@@ -117,13 +112,12 @@ class Wallet extends Component {
       });
     }
     else {
-      return this.stop();
+      return this.setState({ error: ERROR, step: 'Error' });
     }
   }
 
   doneConnectDevice(er, re) {
     if (er) return this.setState({ error: er, step: 'Error' });
-    if (!re) return this.stop();
 
     if (re.subType === 'ledger-nano-s') {
       this.setState({
@@ -133,19 +127,19 @@ class Wallet extends Component {
       });
     }
     else {
-      return this.stop();
+      this.setState({ error: ERROR, step: 'Error' });
     }
   }
 
   doneConfirmAddress(er, re) {
     if (er) return this.setState({ error: er, step: 'Error' });
-    else if (!re) return this.stop();
-    else this.done(null, re.provider);
-    return this.setState(DEFAULT_STATE);
+    return this.end(null, re);
   }
 
-  stop() {
-    this.setState({ ...DEFAULT_STATE });
+  end(er, re) {
+    if (er) this.done(er, null);
+    else this.done(null, re.provider);
+    return this.setState(DEFAULT_STATE);
   }
 
   render() {
@@ -156,7 +150,7 @@ class Wallet extends Component {
         <ConnectDevice visible={this.state.step === 'ConnectDevice' && !this.state.passphrase} data={this.state} done={this.doneConnectDevice} />
         <ConfirmAddress visible={this.state.step === 'ConfirmAddress' && !this.state.passphrase} data={this.state} done={this.doneConfirmAddress} />
         <InputPassphrase visible={this.state.passphrase} done={(er, re) => { this.state.callback(er, re) }} />
-        <ErrorModal visible={this.state.step === 'Error' && !this.state.passphrase} error={this.state.error} done={() => { this.done(this.state.error, null) }} />
+        <ErrorModal visible={this.state.step === 'Error' && !this.state.passphrase} error={this.state.error} done={() => { this.end(this.state.error, null) }} />
       </div>
     )
   }

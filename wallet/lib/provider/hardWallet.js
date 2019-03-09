@@ -66,10 +66,10 @@ class HardWallet {
     this.hardware = null;
     this.dpath = util.addDPath(accOpts.path, accOpts.index);
     var ok = this.setAccount(accOpts.getAddress, accOpts.signTransaction);
-    if (!ok) throw new Error(error.CANNOT_SET_ACCOUNT);
+    if (!ok) return callback(error.CANNOT_SET_ACCOUNT, null);
     this.web3 = engine.web3;
     // We used callback to fomalize code interface with other classes
-    return callback(this.web3);
+    return callback(null, this.web3);
   }
 
   /**

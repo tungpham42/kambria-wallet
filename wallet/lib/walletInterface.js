@@ -1,28 +1,35 @@
 var EventEmitter = require('events');
+var util = require('./util');
 
+const TYPE = require('./type');
 const ERROR = require('./error');
 const CHANGED = require('./changed');
 
 class WalletInterface {
-  constructor() {
+
+  /**
+   * Constructor
+   * @param {*} net - chain code
+   * @param {*} type - softwallet/hardwallet
+   * @param {*} restrict - disallow network change
+   */
+  constructor(net, type, restrict) {
     class Emitter extends EventEmitter { }
     this.emitter = new Emitter();
 
+    this.net = util.chainCode(net);
+    this.type = type === TYPE.HARDWALLET ? TYPE.HARDWALLET : TYPE.SOFTWALLET;
+    this.restrict = restrict;
+    this.provider = null;
+    this.web3 = null;
+
+
     this.user = {
-      network: null,
+      network: this.net,
       account: null,
       balance: null,
       changed: null
     };
-
-    this.web3 = null;
-  }
-
-  /**
-   * Default meta status, need to be overwriten.
-   */
-  metaStatus() {
-    throw new Error(ERROR.META_STATUS_UNSUPPORTED);
   }
 
   /**
@@ -82,7 +89,7 @@ class WalletInterface {
     var self = this;
     return new Promise((resolve, reject) => {
       self.getNetwork().then(re => {
-        self.user.network = re;
+        self.user.network = util.chainCode(re);
         return self.getAccount();
       }).then(re => {
         self.user.account = re;
@@ -107,14 +114,20 @@ class WalletInterface {
       var watchCurrentAccount = setInterval(() => {
         // Watch switching network event
         self.getNetwork().then(re => {
-          if (self.user.network !== re) {
-            self.user.network = re;
-            self.user.changed = CHANGED.NETWORK;
-            let data = JSON.parse(JSON.stringify(self.user));
-            return self.emitter.emit('data', data);
+          if (self.restrict) {
+            if (self.user.network !== util.chainCode(re)) {
+              return self.emitter.emit('error', ERROR.INVALID_NETWORK);
+            }
+          }
+          else {
+            if (self.user.network !== util.chainCode(re)) {
+              self.user.network = re;
+              self.user.changed = CHANGED.NETWORK;
+              let data = JSON.parse(JSON.stringify(self.user));
+              return self.emitter.emit('data', data);
+            }
           }
         }).catch(er => {
-          self.user.network = null;
           return self.emitter.emit('error', er);
         });
         // Watch switching account event
