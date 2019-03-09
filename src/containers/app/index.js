@@ -5,8 +5,6 @@ import Wallet from 'containers/wallet';
 import Metamask from 'containers/metamask';
 import Isoxys from 'containers/isoxys';
 
-var Web3 = require('web3');
-
 const margin = { marginRight: 1 + 'em' };
 
 class App extends Component {
