@@ -83,9 +83,7 @@ class FiniteStateMachine {
     let keys = Object.keys(pattern);
     for (let key of keys) {
       if (typeof pattern[key] === 'boolean') {
-        if (pattern[key] === '*') return true;
-        else if (pattern[key] === Boolean(data[key])) return true;
-        else return false;
+        if (pattern[key] !== '*' && pattern[key] !== Boolean(data[key])) return false;
       }
       else if (pattern[key] !== '*' && pattern[key] !== data[key]) return false;
     }
