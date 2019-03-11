@@ -1,9 +1,9 @@
 var EventEmitter = require('events');
-var util = require('./util');
+var util = require('../util');
 
-const TYPE = require('./type');
-const ERROR = require('./error');
-const CHANGED = require('./changed');
+const TYPE = require('../type');
+const ERROR = require('../error');
+const CHANGED = require('../changed');
 
 class WalletInterface {
 
@@ -17,7 +17,7 @@ class WalletInterface {
     class Emitter extends EventEmitter { }
     this.emitter = new Emitter();
 
-    this.net = util.chainCode(net);
+    this.net = net ? util.chainCode(net) : 1;
     this.type = type === TYPE.HARDWALLET ? TYPE.HARDWALLET : TYPE.SOFTWALLET;
     this.restrict = restrict;
     this.provider = null;

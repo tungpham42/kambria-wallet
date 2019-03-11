@@ -1,4 +1,4 @@
-var WalletInterface = require('../walletInterface');
+var WalletInterface = require('../interfaces/walletInterface');
 var util = require('../util');
 var Web3 = require('web3');
 

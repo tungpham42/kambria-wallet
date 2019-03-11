@@ -161,7 +161,7 @@ class TestIsoxys extends Component {
       TXID: 0
     }
 
-    this.isoxys = new Isoxys(NETWORK, TYPE);
+    this.isoxys = new Isoxys(NETWORK, TYPE, true);
 
     this.isoxys.setAccountByMnemonic(accOpts.mnemonic, accOpts.password, null, 0, accOpts.passphrase);
 
