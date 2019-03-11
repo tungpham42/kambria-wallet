@@ -71,10 +71,14 @@ class FiniteStateMachine {
 
   constructor() {
     this.data = DEFAULT;
+    this.index = 0;
+    this.history = [this.data];
   }
 
   reset() {
     this.data = DEFAULT;
+    this.index = 0;
+    this.history = [this.data];
   }
 
   match(pattern, data) {
@@ -90,8 +94,20 @@ class FiniteStateMachine {
     return true;
   }
 
+  back() {
+    if (this.index > 0) {
+      this.history.length = this.index;
+      this.index = this.index - 1;
+      this.data = this.history[this.index];
+    }
+  }
+
   next(data) {
     this.data = { ...this.data, ...data }
+
+    this.history.push(this.data);
+    this.index = this.index + 1;
+
     let currentState = MACHINE[this.data.step];
     for (let nextState of currentState.nextState) {
       let ok = this.match(nextState.pattern, this.data);
