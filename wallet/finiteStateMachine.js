@@ -78,6 +78,10 @@ class FiniteStateMachine {
   reset() {
     this.data = DEFAULT;
     this.index = 0;
+    for (let i = 0; i < this.history.length; i++) {
+      delete this.history[i];
+    }
+    this.history.length = 0;
     this.history = [this.data];
   }
 
@@ -96,6 +100,7 @@ class FiniteStateMachine {
 
   back() {
     if (this.index > 0) {
+      delete this.history[this.history.length - 1];
       this.history.length = this.index;
       this.index = this.index - 1;
       this.data = this.history[this.index];
