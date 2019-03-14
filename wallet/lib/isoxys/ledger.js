@@ -3,7 +3,7 @@ require("@babel/polyfill"); // To fix  error 'regeneratorRuntime is not defined'
 var Eth = require('@ledgerhq/hw-app-eth').default;
 var TransportU2F = require('@ledgerhq/hw-transport-u2f').default;
 var util = require('../util');
-const error = require('../error');
+const error = require('../constant/error');
 const _default = require('./defaultConst');
 
 /**

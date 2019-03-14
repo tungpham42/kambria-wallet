@@ -10,7 +10,7 @@ var RpcSubprovider = require('web3-provider-engine/subproviders/rpc.js');
 
 const _defaut = require('./defaultFunc');
 const getRPC = require('../rpc');
-const error = require('../../error');
+const error = require('../../constant/error');
 
 class Modularc {
   /**

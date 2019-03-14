@@ -1,4 +1,4 @@
-var WalletInterface = require('../interfaces/walletInterface');
+var WalletInterface = require('../interface/walletInterface');
 var async = {
   eachOf: require('async/eachOf')
 }
@@ -9,7 +9,7 @@ var Mnemonic = require('./mnemonic');
 var Keystore = require('./keystore');
 var Ledger = require('./ledger');
 
-const TYPE = require('../type');
+const TYPE = require('../constant/type');
 
 
 class Isoxys extends WalletInterface {

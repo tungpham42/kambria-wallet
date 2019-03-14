@@ -1,9 +1,9 @@
 var EventEmitter = require('events');
 var util = require('../util');
 
-const TYPE = require('../type');
-const ERROR = require('../error');
-const CHANGED = require('../changed');
+const TYPE = require('../constant/type');
+const ERROR = require('../constant/error');
+const CHANGED = require('../constant/changed');
 
 class WalletInterface {
 

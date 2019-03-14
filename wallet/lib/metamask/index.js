@@ -1,8 +1,8 @@
-var WalletInterface = require('../interfaces/walletInterface');
+var WalletInterface = require('../interface/walletInterface');
 var util = require('../util');
 var Web3 = require('web3');
 
-const ERROR = require('../error')
+const ERROR = require('../constant/error')
 
 class Metamask extends WalletInterface {
   constructor(net, type, restrict) {
@@ -22,7 +22,7 @@ class Metamask extends WalletInterface {
       return callback(null, web3);
     }).catch(er => {
       return callback(er, null);
-    })
+    });
   }
 }
 

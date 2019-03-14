@@ -2,7 +2,7 @@ var Engine = require('./engine').zeroc;
 var Store = require('./store').sessionStorage;
 var util = require('../util');
 
-const error = require('../error');
+const error = require('../constant/error');
 
 class HardWallet {
   /**
