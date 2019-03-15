@@ -11,15 +11,15 @@ class WalletInterface {
    * Constructor
    * @param {*} net - chain code
    * @param {*} type - softwallet/hardwallet
-   * @param {*} restrict - disallow network change
+   * @param {*} restricted - disallow network change
    */
-  constructor(net, type, restrict) {
+  constructor(net, type, restricted) {
     class Emitter extends EventEmitter { }
     this.emitter = new Emitter();
 
     this.net = net ? util.chainCode(net) : 1;
     this.type = type === TYPE.HARDWALLET ? TYPE.HARDWALLET : TYPE.SOFTWALLET;
-    this.restrict = restrict;
+    this.restricted = restricted;
     this.provider = null;
     this.web3 = null;
 
@@ -114,7 +114,7 @@ class WalletInterface {
       var watchCurrentAccount = setInterval(() => {
         // Watch switching network event
         self.getNetwork().then(re => {
-          if (self.restrict) {
+          if (self.restricted) {
             if (self.user.network !== util.chainCode(re)) {
               return self.emitter.emit('error', ERROR.INVALID_NETWORK);
             }
