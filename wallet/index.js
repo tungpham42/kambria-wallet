@@ -143,8 +143,8 @@ class Wallet extends Component {
     if (er) return this.setState({ error: er, step: 'Error' });
     else if (!re) return this.stop();
     else {
+      window.kambria.wallet = { ...window.kambria.wallet, provider: re.provider }
       this.done(null, re.provider);
-      window.kambria.wallet = { ...window.kambria.wallet, ...re.provider }
     }
     return this.setState(DEFAULT_STATE);
   }
