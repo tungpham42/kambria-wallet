@@ -40,7 +40,9 @@ class Wallet extends Component {
     this.stop = this.stop.bind(this);
 
     var self = this;
-    window.GET_PASSPHRASE = function (callback) {
+    window.kambria = {};
+    window.kambria.wallet = {}
+    window.kambria.wallet.getPassphrase = function (callback) {
       self.setState({ passphrase: false, callback: null }, function () {
         self.setState({ passphrase: true, callback: callback });
       });
@@ -140,7 +142,10 @@ class Wallet extends Component {
   doneConfirmAddress(er, re) {
     if (er) return this.setState({ error: er, step: 'Error' });
     else if (!re) return this.stop();
-    else this.done(null, re.provider);
+    else {
+      this.done(null, re.provider);
+      window.kambria.wallet = { ...window.kambria.wallet, ...re.provider }
+    }
     return this.setState(DEFAULT_STATE);
   }
 

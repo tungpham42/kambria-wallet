@@ -215,7 +215,7 @@ class ConfirmAddress extends Component {
             data.asset.password,
             DEFAULT_HD_PATH,
             i,
-            window.GET_PASSPHRASE,
+            window.kambria.wallet.getPassphrase,
             function () {
               return resolve(isoxys);
             });
@@ -224,7 +224,7 @@ class ConfirmAddress extends Component {
           return isoxys.setAccountByKeystore(
             data.asset.keystore,
             data.asset.password,
-            window.GET_PASSPHRASE,
+            window.kambria.wallet.getPassphrase,
             function () {
               return resolve(isoxys);
             });
@@ -240,7 +240,7 @@ class ConfirmAddress extends Component {
         case 'private-key':
           return isoxys.setAccountByPrivatekey(
             data.asset.privateKey,
-            window.GET_PASSPHRASE,
+            window.kambria.wallet.getPassphrase,
             function () {
               return resolve(isoxys);
             });
