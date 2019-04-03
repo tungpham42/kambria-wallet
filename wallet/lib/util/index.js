@@ -3,6 +3,7 @@ var ethTx = require('ethereumjs-tx');
 var Util = function () { }
 
 Util.chainCode = function (net) {
+  if (!net) return null;
   net = net.toString().toLowerCase();
   switch (net) {
     case '1':
@@ -22,7 +23,7 @@ Util.chainCode = function (net) {
     case 'rinkeby':
       return 4;
     default:
-      return 1;
+      return null;
   }
 }
 
@@ -61,7 +62,7 @@ Util.genRawTx = function (txParams) {
 }
 
 Util.signRawTx = function (txParams, priv) {
-  var rawTx = Util.genRawTx (txParams).raw;
+  var rawTx = Util.genRawTx(txParams).raw;
   rawTx.sign(Buffer.from(priv, 'hex'));
   var signedTx = Util.padHex(rawTx.serialize().toString('hex'));
   return signedTx;

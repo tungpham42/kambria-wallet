@@ -1,15 +1,44 @@
 var WalletInterface = require('../walletInterface');
 var Web3 = require('web3');
+var util = require('../util');
 
 const STATUS = require('./status');
+const ERROR = require('../error');
 
 
 class Metamask extends WalletInterface {
-  constructor() {
-    super();
+  constructor(net, type) {
+    super(net, type);
+  }
 
-    if (!window.web3 || !window.web3.currentProvider) throw new Error(ERROR.CANNOT_FOUND_PROVIDER);
-    this.web3 = new Web3(window.web3.currentProvider);
+  getAccountByMetamask(callback) {
+    this.provider = window.ethereum;
+    if (!this.provider)
+      return callback(ERROR.CANNOT_FOUND_PROVIDER, null);
+    if (util.chainCode(this.provider.networkVersion) != util.chainCode(this.net))
+      return callback(ERROR.INVALID_NETWORK, null);
+
+    this.provider.enable().then(re => {
+      return callback(null, re);
+    }).catch(er => {
+      return callback(er, null);
+    });
+  }
+
+  setAccountByMetamask(callback) {
+    var self = this;
+    this.provider = window.ethereum;
+    if (!this.provider)
+      return callback(ERROR.CANNOT_FOUND_PROVIDER, null);
+    if (util.chainCode(this.provider.networkVersion) != util.chainCode(this.net))
+      return callback(ERROR.INVALID_NETWORK, null);
+
+    this.provider.enable().then(re => {
+      self.web3 = new Web3(self.provider);
+      return callback(null, self.web3);
+    }).catch(er => {
+      return callback(er, null);
+    });
   }
 
   /**

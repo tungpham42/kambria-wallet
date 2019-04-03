@@ -1,10 +1,11 @@
 var EventEmitter = require('events');
 
+const TYPE = require('./type');
 const ERROR = require('./error');
 const CHANGED = require('./changed');
 
 class WalletInterface {
-  constructor() {
+  constructor(net, type) {
     class Emitter extends EventEmitter { }
     this.emitter = new Emitter();
 
@@ -16,6 +17,8 @@ class WalletInterface {
     };
 
     this.web3 = null;
+    this.net = net ? net : 1;
+    this.type = type === TYPE.HARDWALLET ? TYPE.HARDWALLET : TYPE.SOFTWALLET;
   }
 
   /**

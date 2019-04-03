@@ -59,8 +59,12 @@ class ConfirmAddress extends Component {
 
     // Confirm Metmask address
     if (this.props.data.wallet === 'metamask') {
-      var metamask = this.setAddressByMetamask();
-      this.done(null, { provider: metamask });
+      var self = this;
+      this.setAddressByMetamask(this.props.data).then(metamask => {
+        self.done(null, { provider: metamask });
+      }).catch(er => {
+        self.done(er, null);
+      });
     }
     // Confirm Isoxys address
     else if (this.props.data.wallet === 'isoxys') {
@@ -115,7 +119,7 @@ class ConfirmAddress extends Component {
    */
   getAddress(data) {
     if (data.wallet === 'metamask') {
-      this.getAddressByMetamask().then(re => {
+      this.getAddressByMetamask(data).then(re => {
         return this.setState({ addressList: re });
       }).catch(er => {
         if (er) return this.onClose(ERROR);
@@ -136,20 +140,24 @@ class ConfirmAddress extends Component {
   /**
    * Wallet conventions
    */
-  getAddressByMetamask() {
-    var metamask = new Metamask();
+  getAddressByMetamask(data) {
+    var metamask = new Metamask(data.net, data.type);
     return new Promise((resolve, reject) => {
-      metamask.getAccount().then(re => {
-        return resolve([re]);
-      }).catch(er => {
-        return reject(er);
+      metamask.getAccountByMetamask((er, re) => {
+        if (er) return reject(er);
+        return resolve(re);
       });
     });
   }
 
-  setAddressByMetamask() {
-    var metamask = new Metamask();
-    return metamask;
+  setAddressByMetamask(data) {
+    var metamask = new Metamask(data.net, data.type);
+    return new Promise((resolve, reject) => {
+      metamask.setAccountByMetamask((er, re) => {
+        if (er) return reject(er);
+        return resolve(metamask);
+      });
+    });
   }
 
   getAddressByIsoxys(data, limit, page) {
@@ -289,7 +297,7 @@ class ConfirmAddress extends Component {
           {
             (!this.state.addressList || this.state.addressList.length <= 0 || this.state.loading) ?
               <p className={cx("d-block", "text-center", "mb-4")} style={{ "color": "#282F38", "fontSize": "16px", "lineHeight": "18px" }}>
-                Loading address<Loading/>
+                Loading address<Loading />
               </p>
               : null
           }

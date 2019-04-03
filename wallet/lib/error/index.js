@@ -5,6 +5,7 @@ module.exports = {
   CANNOT_GET_BALANCE: 'Cannot get balance',
   CANNOT_SET_ACCOUNT: 'Cannot set account',
   CANNOT_UNLOCK_ACCOUNT: 'Cannot unlock account',
+  INVALID_NETWORK: 'Invalid network',
   INVALID_ADDRESS: 'Invalid address',
   INVALID_MNEMONIC: 'Invalid mnemonic',
   INVALID_SEED: 'Invalid seed',

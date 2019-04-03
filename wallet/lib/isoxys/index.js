@@ -13,11 +13,9 @@ const TYPE = require('../type');
 class Isoxys extends WalletInterface {
 
   constructor(net, type) {
-    super();
-
-    this.net = net;
+    super(net, type);
+    
     this.provider = null;
-    this.type = type === TYPE.HARDWALLET ? TYPE.HARDWALLET : TYPE.SOFTWALLET;
   }
 
   /**

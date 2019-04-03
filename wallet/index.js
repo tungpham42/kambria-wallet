@@ -41,7 +41,7 @@ class Wallet extends Component {
 
     var self = this;
     window.kambria = {};
-    window.kambria.wallet = {}
+    window.kambria.wallet = {};
     window.kambria.wallet.getPassphrase = function (callback) {
       self.setState({ passphrase: false, callback: null }, function () {
         self.setState({ passphrase: true, callback: callback });
