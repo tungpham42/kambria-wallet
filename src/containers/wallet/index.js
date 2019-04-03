@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Wallet from '@kambria/kambria-wallet';
+import { Token } from '@kambria/kambria-contract';
 
 
 class TestWallet extends Component {
@@ -17,7 +18,8 @@ class TestWallet extends Component {
 
     this.register = this.register.bind(this);
     this.done = this.done.bind(this);
-    this.sendTx = this.sendTx.bind(this);
+    this.sendETH = this.sendETH.bind(this);
+    this.sendKAT = this.sendKAT.bind(this);
   }
 
   register(force) {
@@ -47,16 +49,29 @@ class TestWallet extends Component {
     return this.setState({ provider: provider });
   }
 
-  sendTx() {
+  sendETH() {
     var self = this;
     var provider = this.state.provider;
     provider.web3.eth.sendTransaction({
       from: self.state.account,
-      to: '0x5a926b235e992d6ba52d98415e66afe5078a1690',
+      to: self.state.account,
       value: '1000000000000000'
     }, function (er, txId) {
       if (er) return self.setState({ error: JSON.stringify(er) });
       return self.setState({ txId: txId.toString() });
+    });
+  }
+
+  sendKAT() {
+    var self = this;
+    var provider = this.state.provider;
+    var token = new Token('0x9dddff7752e1714c99edf940ae834f0d57d68546', provider.web3);
+    token.transfer(self.state.account, '1000000000000000000').then(txId => {
+      console.log(txId)
+      return self.setState({ txId: txId.toString() });
+    }).catch(er => {
+      console.log(er)
+      return self.setState({ error: JSON.stringify(er) });
     });
   }
 
@@ -71,7 +86,8 @@ class TestWallet extends Component {
           <p>Account: {this.state.account}</p>
           <p>Balance: {this.state.balance}</p>
           <p>Previous tx id: <a target="_blank" rel="noopener noreferrer" href={"https://rinkeby.etherscan.io/tx/" + this.state.txId}>{this.state.txId}</a></p>
-          <button onClick={this.sendTx}>Send Tx</button>
+          <button onClick={this.sendETH}>Send ETH</button>
+          <button onClick={this.sendKAT}>Send KAT</button>
           {this.state.error ? <a >{this.state.error}</a> : null}
         </div>
         <Wallet visible={this.state.visible} net={4} done={this.done} />
