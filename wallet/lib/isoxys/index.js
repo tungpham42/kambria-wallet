@@ -112,7 +112,7 @@ class Isoxys extends WalletInterface {
    * @param {function} getPassphrase - simulate the account locking/unlocking
    */
   setAccountByMnemonic(mnemonic, password, path, index, getPassphrase, callback) {
-    var seed = Mnemonic.mnemonicToSeed(mnemonic, password)
+    var seed = Mnemonic.mnemonicToSeed(mnemonic, password);
     var hdk = Mnemonic.seedToHDKey(seed);
     var account = Mnemonic.hdkeyToAccount(hdk, path, index);
     account.getPassphrase = getPassphrase;
@@ -131,7 +131,7 @@ class Isoxys extends WalletInterface {
   getAccountsByMnemonic(mnemonic, password, path, limit, page, callback) {
     var list = [];
     for (var i = page * limit; i < page * limit + limit; i++) {
-      var seed = Mnemonic.mnemonicToSeed(mnemonic, password)
+      var seed = Mnemonic.mnemonicToSeed(mnemonic, password);
       var hdk = Mnemonic.seedToHDKey(seed);
       var address = Mnemonic.hdkeyToAddress(hdk, path, i);
       list.push(address);
