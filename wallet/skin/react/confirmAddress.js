@@ -3,7 +3,6 @@ import Modal from './core/modal';
 import Loading from './core/loading';
 import { Button } from './core/buttons';
 
-var Metamask = require('../../lib/metamask');
 var Isoxys = require('../../lib/isoxys');
 
 // Setup CSS Module
@@ -55,21 +54,11 @@ class ConfirmAddress extends Component {
   }
 
   onConfirm() {
+    var self = this;
     this.setState({ visible: false });
-
-    // Confirm Metmask address
-    if (this.props.data.wallet === 'metamask') {
-      var self = this;
-      this.setAddressByMetamask(this.props.data).then(metamask => {
-        self.done(null, { provider: metamask });
-      }).catch(er => {
-        self.done(er, null);
-      });
-    }
     // Confirm Isoxys address
-    else if (this.props.data.wallet === 'isoxys') {
-      var self = this;
-      this.setAddressByIsoxys(this.props.data, this.state.i).then(isoxys => {
+    if (this.props.data.wallet === 'isoxys') {
+      this.initIsoxys(this.props.data, this.state.i).then(isoxys => {
         self.done(null, { provider: isoxys });
       }).catch(er => {
         self.done(er, null);
@@ -118,14 +107,8 @@ class ConfirmAddress extends Component {
    * Data controllers
    */
   getAddress(data) {
-    if (data.wallet === 'metamask') {
-      this.getAddressByMetamask(data).then(re => {
-        return this.setState({ addressList: re });
-      }).catch(er => {
-        if (er) return this.onClose(ERROR);
-      });
-    }
-    else if (data.wallet === 'isoxys') {
+    // We don't need to get address in case of metamask
+    if (data.wallet === 'isoxys') {
       this.getAddressByIsoxys(data, this.state.limit, this.state.page).then(re => {
         return this.setState({ addressList: re });
       }).catch(er => {
@@ -140,29 +123,8 @@ class ConfirmAddress extends Component {
   /**
    * Wallet conventions
    */
-  getAddressByMetamask(data) {
-    var metamask = new Metamask(data.net, data.type);
-    return new Promise((resolve, reject) => {
-      metamask.getAccountByMetamask((er, re) => {
-        if (er) return reject(er);
-        return resolve(re);
-      });
-    });
-  }
-
-  setAddressByMetamask(data) {
-    var metamask = new Metamask(data.net, data.type);
-    return new Promise((resolve, reject) => {
-      metamask.setAccountByMetamask((er, re) => {
-        if (er) return reject(er);
-        return resolve(metamask);
-      });
-    });
-  }
-
   getAddressByIsoxys(data, limit, page) {
-    var isoxys = new Isoxys(data.net, data.type);
-
+    var isoxys = new Isoxys(data.net, data.type, true);
     return new Promise((resolve, reject) => {
       switch (data.subType) {
         // Mnemonic
@@ -211,9 +173,8 @@ class ConfirmAddress extends Component {
     });
   }
 
-  setAddressByIsoxys(data, i) {
-    var isoxys = new Isoxys(data.net, data.type);
-
+  initIsoxys(data, i) {
+    var isoxys = new Isoxys(data.net, data.type, true);
     return new Promise((resolve, reject) => {
       switch (data.subType) {
         // Mnemonic
@@ -224,7 +185,8 @@ class ConfirmAddress extends Component {
             DEFAULT_HD_PATH,
             i,
             window.kambria.wallet.getPassphrase,
-            function () {
+            function (er, re) {
+              if (er) return reject(er);
               return resolve(isoxys);
             });
         // Keystore
@@ -233,7 +195,8 @@ class ConfirmAddress extends Component {
             data.asset.keystore,
             data.asset.password,
             window.kambria.wallet.getPassphrase,
-            function () {
+            function (er, re) {
+              if (er) return reject(er);
               return resolve(isoxys);
             });
         // Ledger Nano S
@@ -241,7 +204,8 @@ class ConfirmAddress extends Component {
           return isoxys.setAccountByLedger(
             DEFAULT_HD_PATH,
             i,
-            function () {
+            function (er, re) {
+              if (er) return reject(er);
               return resolve(isoxys);
             });
         // Private key
@@ -249,7 +213,8 @@ class ConfirmAddress extends Component {
           return isoxys.setAccountByPrivatekey(
             data.asset.privateKey,
             window.kambria.wallet.getPassphrase,
-            function () {
+            function (er, re) {
+              if (er) return reject(er);
               return resolve(isoxys);
             });
         // Error

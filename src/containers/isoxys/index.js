@@ -49,7 +49,7 @@ class TestIsoxys extends Component {
       TXID: 0
     }
 
-    this.isoxys = new Isoxys(NETWORK, TYPE);
+    this.isoxys = new Isoxys(NETWORK, TYPE, true);
 
     var _test = function () {
       self.isoxys.web3.eth.getCoinbase(function (er, re) {

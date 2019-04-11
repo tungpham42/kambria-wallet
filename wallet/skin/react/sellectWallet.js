@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Button } from './core/buttons';
 import Modal from './core/modal';
 
+var Metamask = require('../../lib/metamask');
+
 // Setup CSS Module
 import classNames from 'classnames/bind';
 import style from 'Style/index.scss';
@@ -29,9 +31,19 @@ class SellectWallet extends Component {
     this.done(er, null);
   }
 
-  onMetamask() {
+  onMetamask(type) {
     this.setState({ visible: false });
-    this.done(null, { wallet: 'metamask', type: 'softwallet' });
+    var self = this;
+    var metamask = new Metamask(this.data.net, type, true);
+    metamask.setAccountByMetamask(function (er, re) {
+      if (er) return self.done(er, null);
+
+      self.done(null, {
+        wallet: 'metamask',
+        type: type,
+        provider: metamask
+      });
+    });
   }
 
   onIsoxys(type) {
@@ -62,7 +74,7 @@ class SellectWallet extends Component {
               <Button
                 type="primary"
                 size="sm"
-                onClick={this.onMetamask}>Metamask</Button>
+                onClick={() => this.onMetamask('softwallet')}>Metamask</Button>
             </div>
             <div className={cx("vl")} style={{ "left": "257px" }}></div>
             <div className={cx("wallet", "hardware")}>

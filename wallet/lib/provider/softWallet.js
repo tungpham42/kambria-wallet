@@ -1,11 +1,15 @@
 var ethUtil = require('ethereumjs-util');
-var cryptoJS = require('crypto-js');
-var aes = cryptoJS.AES;
+var cryptoJS = {
+  AES: require('crypto-js/aes'),
+  PBKDF2: require('crypto-js/pbkdf2'),
+  enc: { Utf8: require('crypto-js/enc-utf8') },
+  lib: { WordArray: require('crypto-js/lib-typedarrays') }
+}
 var Engine = require('./engine').zeroc;
 var Store = require('./store').sessionStorage;
 var util = require('../util');
 
-const error = require('../error');
+const error = require('../constant/error');
 
 class SoftWallet {
   /**
@@ -63,9 +67,9 @@ class SoftWallet {
     this.getPassphrase = accOpts.getPassphrase;
     var engine = new Engine(this.network, this.opts());
     this.setAccount(accOpts.address, accOpts.privateKey, accOpts.getPassphrase, function (er, re) {
-      if (er) throw new Error(error.CANNOT_SET_ACCOUNT);
+      if (er) return callback(error.CANNOT_SET_ACCOUNT, null);
       self.web3 = engine.web3;
-      return callback(self.web3);
+      return callback(null, self.web3);
     });
   }
 
@@ -94,7 +98,7 @@ class SoftWallet {
       var password = self.constructPassword(passphrase, salt);
       if (!password) return callback('Cannot set up password', null);
 
-      var encryptedPriv = aes.encrypt(privateKey, password).toString();
+      var encryptedPriv = cryptoJS.AES.encrypt(privateKey, password).toString();
       var acc = {
         ADDRESS: address,
         PRIVATEKEY: encryptedPriv,
@@ -140,13 +144,15 @@ class SoftWallet {
    * @param {*} passphrase 
    */
   unlockAccount(passphrase) {
-    var password = this.constructPassword(passphrase, this.getSalt());
-    var enpriv = this.getPrivateKey();
-    if (!password || !enpriv) return null;
-    var priv = aes.decrypt(enpriv, password);
-    if (!priv) return null;
-    priv = priv.toString(cryptoJS.enc.Utf8);
-    return priv;
+    try {
+      var password = this.constructPassword(passphrase, this.getSalt());
+      var enpriv = this.getPrivateKey();
+      if (!password || !enpriv) return null;
+      var priv = cryptoJS.AES.decrypt(enpriv, password);
+      if (!priv) return null;
+      priv = priv.toString(cryptoJS.enc.Utf8);
+      return priv;
+    } catch (er) { return null; } // Try catch unexpected Error
   }
 
   /**

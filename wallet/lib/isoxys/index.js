@@ -1,5 +1,7 @@
-var WalletInterface = require('../walletInterface');
-var async = require("async");
+var WalletInterface = require('../interface/walletInterface');
+var async = {
+  eachOfSeries: require('async/eachOfSeries')
+}
 var util = require('../util');
 var Provider = require('../provider');
 var Privatekey = require('./privatekey');
@@ -7,14 +9,13 @@ var Mnemonic = require('./mnemonic');
 var Keystore = require('./keystore');
 var Ledger = require('./ledger');
 
-const TYPE = require('../type');
+const TYPE = require('../constant/type');
 
 
 class Isoxys extends WalletInterface {
-
-  constructor(net, type) {
+  constructor(net, type, restrict) {
     super(net, type);
-    
+
     this.provider = null;
   }
 
@@ -28,9 +29,10 @@ class Isoxys extends WalletInterface {
     this.provider = (this.type === TYPE.HARDWALLET) ?
       new Provider.HardWallet(this.net) :
       new Provider.SoftWallet(this.net);
-    this.provider.init(accOpts, function (web3) {
+    this.provider.init(accOpts, function (er, web3) {
+      if (er) return callback(er, null);
       self.web3 = web3;
-      return callback();
+      return callback(null, web3);
     });
   }
 
@@ -112,11 +114,13 @@ class Isoxys extends WalletInterface {
    * @param {function} getPassphrase - simulate the account locking/unlocking
    */
   setAccountByMnemonic(mnemonic, password, path, index, getPassphrase, callback) {
-    var seed = Mnemonic.mnemonicToSeed(mnemonic, password)
-    var hdk = Mnemonic.seedToHDKey(seed);
-    var account = Mnemonic.hdkeyToAccount(hdk, path, index);
-    account.getPassphrase = getPassphrase;
-    this.setWallet(account, callback);
+    let self = this;
+    Mnemonic.mnemonicToSeed(mnemonic, password, function (seed) {
+      let hdk = Mnemonic.seedToHDKey(seed);
+      let account = Mnemonic.hdkeyToAccount(hdk, path, index);
+      account.getPassphrase = getPassphrase;
+      self.setWallet(account, callback);
+    });
   }
 
   /**
@@ -129,14 +133,15 @@ class Isoxys extends WalletInterface {
    * @param {*} page - index of page
    */
   getAccountsByMnemonic(mnemonic, password, path, limit, page, callback) {
-    var list = [];
-    for (var i = page * limit; i < page * limit + limit; i++) {
-      var seed = Mnemonic.mnemonicToSeed(mnemonic, password)
-      var hdk = Mnemonic.seedToHDKey(seed);
-      var address = Mnemonic.hdkeyToAddress(hdk, path, i);
-      list.push(address);
-    }
-    return callback(null, list);
+    let list = [];
+    Mnemonic.mnemonicToSeed(mnemonic, password, function (seed) {
+      let hdk = Mnemonic.seedToHDKey(seed);
+      for (let i = page * limit; i < page * limit + limit; i++) {
+        let address = Mnemonic.hdkeyToAddress(hdk, path, i);
+        list.push(address);
+      }
+      return callback(null, list);
+    });
   }
 
 
@@ -208,11 +213,11 @@ class Isoxys extends WalletInterface {
     if (!path) {
       return callback(null, []);
     } else if (coll.length > 0) {
-      async.eachSeries(coll, function (i, cb) {
+      async.eachOfSeries(coll, function (i, index, cb) {
         var dpath = util.addDPath(path, i);
         Ledger.getAddress(dpath, function (er, addr) {
           if (er) return cb(er);
-          if (addr) list.push(addr);
+          if (addr) list[index] = addr;
           return cb();
         });
       }, function (er) {

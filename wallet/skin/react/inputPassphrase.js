@@ -37,8 +37,7 @@ class InputPassphrase extends Component {
     this.setState(DEFAULT_STATE);
   }
 
-  handleSubmit(e) {
-    e.preventDefault()
+  handleSubmit() {
     this.setState({ visible: false });
     if (!this.state.passphrase) this.done(ERROR, null);
     else this.done(null, this.state.passphrase);
@@ -65,6 +64,14 @@ class InputPassphrase extends Component {
     }
   }
 
+  componentDidMount(){
+    // Listen Enter button
+    let input = document.getElementById('inputPassphrase');
+    if (input) input.addEventListener('keyup', e => {
+      if (e.keyCode === 13) this.handleSubmit();
+    });
+  }
+
   render() {
     return (
       <Modal className={cx("wallet-modal", "enter-passphrase")}
@@ -77,13 +84,15 @@ class InputPassphrase extends Component {
           <span className={cx("title", "d-block", "text-center", "mt-4")} style={{ "color": "#13CDAC", "fontSize": "24px" }}>Enter Passphrase</span>
           <p className={cx("d-block", "text-center", "mb-4")} style={{ "color": "#282F38", "fontSize": "16px", "lineHeight": "18px" }}>Please enter an temporary passphrase to proceed</p>
 
-          <input type="password"
+          <input id="inputPassphrase"
+            type="password"
             name="passphrase"
             value={this.state.passphrase}
             onChange={this.onChange}
             ref={(name) => { this.passpharseName = name; }} />
 
           <Button
+            id="btnPassphrase"
             type="primary"
             size="sm"
             customStyle={{ "display": "block", "margin": "16px auto 0" }}

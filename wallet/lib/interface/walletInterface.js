@@ -1,31 +1,35 @@
 var EventEmitter = require('events');
+var util = require('../util');
 
-const TYPE = require('./type');
-const ERROR = require('./error');
-const CHANGED = require('./changed');
+const TYPE = require('../constant/type');
+const ERROR = require('../constant/error');
+const CHANGED = require('../constant/changed');
 
 class WalletInterface {
-  constructor(net, type) {
+
+  /**
+   * Constructor
+   * @param {*} net - chain code
+   * @param {*} type - softwallet/hardwallet
+   * @param {*} restricted - disallow network change
+   */
+  constructor(net, type, restricted) {
     class Emitter extends EventEmitter { }
     this.emitter = new Emitter();
 
+    this.net = net ? util.chainCode(net) : 1;
+    this.type = type === TYPE.HARDWALLET ? TYPE.HARDWALLET : TYPE.SOFTWALLET;
+    this.restricted = restricted;
+    this.provider = null;
+    this.web3 = null;
+
+
     this.user = {
-      network: null,
+      network: this.net,
       account: null,
       balance: null,
       changed: null
     };
-
-    this.web3 = null;
-    this.net = net ? net : 1;
-    this.type = type === TYPE.HARDWALLET ? TYPE.HARDWALLET : TYPE.SOFTWALLET;
-  }
-
-  /**
-   * Default meta status, need to be overwriten.
-   */
-  metaStatus() {
-    throw new Error(ERROR.META_STATUS_UNSUPPORTED);
   }
 
   /**
@@ -55,6 +59,7 @@ class WalletInterface {
   getAccount() {
     var self = this;
     return new Promise((resolve, reject) => {
+      if (self.type === TYPE.HARDWALLET && this.user.account) return resolve(this.user.account);
       self.web3.eth.getAccounts((er, re) => {
         if (er) return reject(er);
         if (re.length <= 0 || !re[0] || !self.isAddress(re[0])) return reject(ERROR.CANNOT_GET_ACCOUNT);
@@ -85,7 +90,7 @@ class WalletInterface {
     var self = this;
     return new Promise((resolve, reject) => {
       self.getNetwork().then(re => {
-        self.user.network = re;
+        self.user.network = util.chainCode(re);
         return self.getAccount();
       }).then(re => {
         self.user.account = re;
@@ -110,14 +115,20 @@ class WalletInterface {
       var watchCurrentAccount = setInterval(() => {
         // Watch switching network event
         self.getNetwork().then(re => {
-          if (self.user.network !== re) {
-            self.user.network = re;
-            self.user.changed = CHANGED.NETWORK;
-            let data = JSON.parse(JSON.stringify(self.user));
-            return self.emitter.emit('data', data);
+          if (self.restricted) {
+            if (self.user.network !== util.chainCode(re)) {
+              return self.emitter.emit('error', ERROR.INVALID_NETWORK);
+            }
+          }
+          else {
+            if (self.user.network !== util.chainCode(re)) {
+              self.user.network = re;
+              self.user.changed = CHANGED.NETWORK;
+              let data = JSON.parse(JSON.stringify(self.user));
+              return self.emitter.emit('data', data);
+            }
           }
         }).catch(er => {
-          self.user.network = null;
           return self.emitter.emit('error', er);
         });
         // Watch switching account event

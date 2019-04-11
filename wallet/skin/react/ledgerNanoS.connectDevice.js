@@ -31,7 +31,7 @@ class LedgerNanoSAsset extends Component {
     var self = this;
     this.setState({ message: STATUS.TEST });
     // Fetch the first address to know whether devide connected
-    var isoxys = new Isoxys(null /** Use default for testing */, 'hardWallet');
+    var isoxys = new Isoxys(null /** Use default for testing */, 'hardWallet', true);
     isoxys.getAccountsByLedger("m/44'/60'/0'", 1, 0, function (er, re) {
       if (er || re.lenght <= 0) return self.setState({ message: STATUS.FAIL });
 

@@ -37,9 +37,11 @@ class TestWallet extends Component {
 
     window.kambria.wallet.provider.watch().then(watcher => {
       watcher.event.on('data', re => {
+        console.log("DEBUG", re)
         return self.setState(re);
       });
       watcher.event.on('error', er => {
+        console.log("DEBUG", er)
         return self.setState({ error: JSON.stringify(er) });
       });
     }).catch(er => {
