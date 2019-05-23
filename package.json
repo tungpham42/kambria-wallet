@@ -1,6 +1,6 @@
 {
   "name": "@kambria/kambria-wallet",
-  "version": "2.1.5",
+  "version": "2.2.1",
   "description": "",
   "main": "index.js",
   "scripts": {

@@ -66,7 +66,10 @@ class Wallet extends Component {
     if (er) return this.setState({ error: er, step: 'Error' }, () => {
       self.FSM.reset();
     });
-    if (!re) return this.FSM.reset(); // Use skip the registration.
+    if (!re) {
+      this.FSM.reset();
+      return this.done('Use skip the registration', null);
+    }
     let state = this.FSM.next(re);
     if (state.step === 'Error') {
       return this.setState({ error: ERROR, step: state.step }, () => {
