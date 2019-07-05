@@ -1,5 +1,5 @@
 require("@babel/polyfill"); // To fix  error 'regeneratorRuntime is not defined'
-
+/* eslint-disable import/first */
 import Eth from "@ledgerhq/hw-app-eth";
 import TransportU2F from "@ledgerhq/hw-transport-u2f";
 var util = require('../util');
